@@ -10,7 +10,7 @@ Java+Shell - Aplicación para firma electrónica de archivos PDF. Fork de las pr
    * commons-net-3.1
    * mail
 
-#Copyright (C) 2008
+## Copyright (C) 2008
 zylk.net
 
 Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2010 por:
