@@ -1,7 +1,7 @@
 # aponwao
 Java+Shell - Aplicación para firma electrónica de archivos PDF. Fork de las primeras versiones de http://www.sinadura.net/es/
 
-# Dependencias:
+## Dependencias
  * itextpdf-v552-nonofficial v010
    * xmlsec-1.5.2-nonofficial
  * bc-jdk15to17-v150-nonofficial v010
@@ -10,7 +10,7 @@ Java+Shell - Aplicación para firma electrónica de archivos PDF. Fork de las pr
    * commons-net-3.1
    * mail
 
-Copyright (C) 2008
+#Copyright (C) 2008
 zylk.net
 
 Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2010 por:
