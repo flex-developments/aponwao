@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="iso-8859-1" standalone="yes" ?>
+
+<!--
+# Copyright 2008 zylk.net
+#
+# This file is part of Sinadura.
+#
+# Sinadura is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# Sinadura is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Sinadura.  If not, see <http://www.gnu.org/licenses/>. [^]
+#
+# See COPYRIGHT.txt for copyright notices and details.
+#
+-->
+
+<installation version="1.0">
+
+	<!--
+		Datos informativos sobre la aplicación, el autor, la organización,
+		etc.
+	-->
+	-
+	<info>
+		<appname>Aponwao</appname>
+		<appsubpath>aponwao</appsubpath>
+		<!-- <appversion>@{version}</appversion>  -->
+		<appversion>1.0</appversion>
+		<authors>
+			<author name="suscerte.gob.ve" email="" />
+                        <author name="zylk.net" email="info@zylk.net" />
+			<author name="irontec" email="info@irontec.com" />
+		</authors>
+		<url>http://www.suscerte.gob.ve</url>
+		<javaversion>1.0</javaversion>
+		<requiresjdk>no</requiresjdk>
+	</info>
+
+
+
+	<!--
+		Preferencias del interfaz gráfico que deseamos para nuestra
+		instalación
+	-->
+	<guiprefs width="640" height="480" resizable="no" />
+
+
+	<!--
+		El interfaz gráfico podrá ser mostrado en Castellano o en Ingles
+	-->
+	<locale>
+		<langpack iso3="spa" />
+		<langpack iso3="eng" />
+	</locale>
+
+
+
+	<!-- Recursos de nuestra instalación -->
+	<resources>
+		<!-- Set the default installation directory shown in the TargetPanel -->
+		<res id="TargetPanel.dir.windows" src="windows-install-path.txt" />
+
+		<!--<res id="InfoPanel.info"   src="install-resources/Readme.txt"/>-->
+
+		<res src="shortcutSpec.xml" id="shortcutSpec.xml" />
+		<res src="Unix_shortcutSpec.xml" id="Unix_shortcutSpec.xml" />
+
+
+	</resources>
+
+	<!-- Requerido para crear el ShortCut -->
+	<native type="izpack" name="ShellLink.dll" />
+
+
+	<!--
+		Paneles que deseamos que sean mostrados. El orden importa excepto en
+		el InstallPanel
+	-->
+	<panels>
+		<panel classname="HelloPanel" />
+		<!-- <panel classname="InfoPanel"/> -->
+		<panel classname="TargetPanel" />
+		<!-- <panel classname="PacksPanel"/>-->
+		<panel classname="InstallPanel" />
+		<panel classname="ShortcutPanel" />
+		<panel classname="SimpleFinishPanel" />
+	</panels>
+
+
+	<!-- Paquetes que componen la aplicación -->
+	<packs>
+		<pack name="aponwao" id="aponwao" required="yes">
+			<description>Archivos de la aplicacion</description>
+			<fileset dir="." targetdir="$INSTALL_PATH">
+				<include name="COPYRIGHT.txt" />
+				<include name="changelog.txt" />
+				<include name="lib/**/*" />
+				<include name="resources/**/*" />
+				<exclude name="resources/preferences/hardware-preferences-win.csv" />
+				<exclude name="resources/preferences/hardware-preferences-linux.csv" />
+				<exclude name="resources/preferences/hardware-preferences.csv" />
+			</fileset>
+
+
+			<!-- Windows -->
+			<fileset dir="bin" targetdir="$INSTALL_PATH/bin">
+				<include name="aponwao-gui.bat" />
+				<include name="aponwao-gui.vbs" />
+				<os family="windows" />
+			</fileset>
+			<singlefile src="resources/preferences/hardware-preferences-win.csv"
+				target="$INSTALL_PATH/resources/preferences/hardware-preferences.csv">
+				<os family="windows" />
+			</singlefile>
+
+
+			<!--  Linux  -->
+			<fileset dir="bin" targetdir="$INSTALL_PATH/bin">
+				<include name="aponwao-console" />
+				<include name="aponwao-gui" />
+				<os family="linux" />
+			</fileset>
+			<singlefile src="resources/preferences/hardware-preferences-linux.csv"
+				target="$INSTALL_PATH/resources/preferences/hardware-preferences.csv">
+				<os name="linux" />
+			</singlefile>
+
+
+			<!-- Linux scripts -->
+			<executable targetfile="$INSTALL_PATH/bin/aponwao-gui"	stage="never">
+				<os name="linux" />
+			</executable>
+
+			<executable targetfile="$INSTALL_PATH/bin/aponwao-console" stage="never">
+				<os name="linux" />
+			</executable>
+
+		</pack>
+
+
+	</packs>
+</installation>
