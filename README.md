@@ -14,8 +14,13 @@ Java+Shell - Aplicación para firma electrónica de archivos PDF. Fork de las pr
 zylk.net
 
 Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2010 por:
+<<<<<<< HEAD
 Ing. Felix D. Lopez M. - flex.developments en gmail | flopez en suscerte gob ve
 Ing. Yessica De Ascencao - yessicadeascencao en gmail | ydeascencao en suscerte gob ve
+=======
+Ing. Felix D. Lopez M. - flex.developments en gmail.com | flopez en suscerte.gob.ve
+Ing. Yessica De Ascencao - yessicadeascencao en gmail.com | ydeascencao en suscerte.gob.ve
+>>>>>>> origin/master
 
 This file is part of Sinadura.
 
