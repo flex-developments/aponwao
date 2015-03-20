@@ -1,0 +1,6 @@
+name;path;
+Gemalto;/usr/lib/ClassicClient/libgclib.so;
+Inteligensa;/usr/local/lib/libcvP11.so;
+OpenSC;/usr/lib/opensc-pkcs11.so;
+ePass2000;/usr/lib/libepsng_p11.so;
+eToken-Aladdin;/usr/lib/libeTPkcs11.so;

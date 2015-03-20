@@ -1,0 +1,136 @@
+Package: aponwao
+Version: 1.3
+Maintainer: suscerte.gob.ve
+Mail: soportedra@suscerte.gob.ve
+Architecture: i386
+Priority: optional
+Short Description: Firma Electrónica
+Description: Aplicación para la firma electrónica de documentos PDF basada en sinadura.
+
+###########################################################################
+
+Depends: rsync (>=3)
+Recommends: oracle-java7-installer (>=7)
+#Recommends: openjdk-7-jre (>=7) | oracle-java7-installer (>=7)
+
+###########################################################################
+
+Target: /usr/local/aponwao
+
+###########################################################################
+
+PostInstalacion:
+#!/bin/bash
+clear
+echo "Inicializando archivos en el home........................."
+UHOME="/home"
+USERS=$(cut -d':' -f1 /etc/passwd)
+for u in $USERS
+do
+	ID=$(id -u $u)
+	if [ $ID -ge 1000 ] ; then
+		if [ -d ${UHOME}/${u} ] ; then
+			#MOVER ARCHIVOS
+                       cp -r /usr/local/aponwao/aponwao-preferencias /${UHOME}/${u}/aponwao-preferencias
+                       sed -i 's/<usuario>/'${u}'/g' /home/${u}/aponwao-preferencias/*.properties
+                       chmod -R 755 /${UHOME}/${u}/aponwao-preferencias
+                       chown -R ${u}:${u} /${UHOME}/${u}/aponwao-preferencias
+		       #CREAR CARPETAS
+		       mkdir -p /${UHOME}/${u}/Firmados
+		       mkdir -p /${UHOME}/${u}/Sin_Firmar
+                       mkdir -p /${UHOME}/${u}/Respaldo
+		       chown -R ${u}:${u} /${UHOME}/${u}/Firmados
+		       chown -R ${u}:${u} /${UHOME}/${u}/Sin_Firmar
+		       chown -R ${u}:${u} /${UHOME}/${u}/Respaldo
+		fi
+	fi
+done
+rm -r /usr/local/aponwao/aponwao-preferencias
+echo "Inicializando archivo de configuracion........................."
+cp /usr/local/aponwao/resources/images/aplicationLogo.png /usr/share/pixmaps/aplicationLogo.png
+chmod -R 755 /usr/share/pixmaps/aplicationLogo.png
+cp /usr/local/aponwao/bin/aponwao /usr/local/bin/aponwao
+chmod -R 755 /usr/local/bin/aponwao
+chmod -R 755 /usr/local/aponwao
+echo ""
+echo "******************************************************"
+echo "                      ATENCION"
+echo " Aponwao requiere la instalación de la plataforma"
+echo " Java-1.7 para su ejecución."
+echo ""
+echo " De momento se ha omitido la obligatoriedad de las"
+echo " dependencias supra mencionadas para la construcción"
+echo " de este paquete .deb, con la finalidad de permitir"
+echo " al usuario la instalación manual de dicha plataforma"
+echo " sin registrarla en los paquetes del sistema."
+echo "******************************************************"
+echo ""
+echo "Listo!"
+
+###########################################################################
+
+PostRemove:
+#!/bin/bash
+echo "Eliminando enlaces"
+#BORRAR CARPETA DE PROPIEDADES
+UHOME="/home"
+USERS=$(cut -d':' -f1 /etc/passwd)
+for u in $USERS
+do
+	ID=$(id -u $u)
+	if [ $ID -ge 1000 ] ; then
+		if [ -d ${UHOME}/${u} ] ; then
+			rm -r ${UHOME}/${u}/aponwao-preferencias
+		fi
+	fi
+done
+echo "Listo!"
+
+###########################################################################
+
+Name=aponwao
+Version=1.3
+suscerte.gob.ve
+soportedra@suscerte.gob.ve
+
+###########################################################################
+
+Copyright (C) 2008 - zylk.net
+ * zylk.net (http://www.zylk.net/)
+
+Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2010 por:
+* Ing. Felix D. Lopez M. - flex.developments en gmail.com | flopez en suscerte.gob.ve
+* Ing. Yessica De Ascencao - yessicadeascencao en gmail.com | ydeascencao en suscerte.gob.ve
+
+Adaptaciones realizadas por:
+ * Ing. Felix D. Lopez M. - flex.developments en gmail
+ * Ing. Yessica De Ascencao - yessicadeascencao en gmail.com
+
+This file is part of Sinadura.
+
+Sinadura is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 2 of the License, or
+(at your option) any later version.
+
+Sinadura is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Sinadura.  If not, see <http://www.gnu.org/licenses/>.
+
+See COPYRIGHT.txt for copyright notices and details.
+
+###########################################################################
+
+Name=Aponwao
+Type=Application
+Exec=aponwao
+Terminal=false
+Comment=Firma Electrónica
+StartupNotify=false
+Icon=/usr/share/pixmaps/aplicationLogo.png
+Encoding=UTF-8
+Categories=Office;

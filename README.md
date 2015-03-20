@@ -2,13 +2,8 @@
 Java+Shell - Aplicación para firma electrónica de archivos PDF. Fork de las primeras versiones de http://www.sinadura.net/es/
 
 ## Dependencias
- * itextpdf-v552-nonofficial v010
-   * xmlsec-1.5.2-nonofficial
- * bc-jdk15to17-v150-nonofficial v010
- * lib-flex-pkikeys v010
- * lib-flex-helpers v010
-   * commons-net-3.1
-   * mail
+ * rsync (>=3)
+ * oracle-java7-installer (>=7)
 
 ## Copyright (C) 2008 - zylk.net
  * zylk.net (http://www.zylk.net/)
@@ -34,6 +29,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Sinadura.  If not, see <http://www.gnu.org/licenses/>. [^]
+along with Sinadura.  If not, see <http://www.gnu.org/licenses/>.
 
 See COPYRIGHT.txt for copyright notices and details.
