@@ -1,6 +1,6 @@
 # aponwao
+  * Versión 2: Python
   * Versión 1: Java+Shell
-  * Versión 2: V2 Python
 Aplicación para firma electrónica de archivos PDF.
 Inicialmente aponwao Versión1 nace como un fork de las primeras versiones de Sinadura (http://www.sinadura.net/es/), sin embargo, actualmente se encuentra en desarrollo la versión 2 cuyo código fuente se escribirá desde cero.
 
