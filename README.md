@@ -1,6 +1,7 @@
 # aponwao
   * Versión 2: Python
   * Versión 1: Java+Shell
+
 Aplicación para firma electrónica de archivos PDF.
 Inicialmente aponwao Versión1 nace como un fork de las primeras versiones de Sinadura (http://www.sinadura.net/es/), sin embargo, actualmente se encuentra en desarrollo la versión 2 cuyo código fuente se escribirá desde cero.
 
@@ -34,6 +35,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Sinadura.  If not, see <http://www.gnu.org/licenses/>. [^]
+along with Sinadura.  If not, see <http://www.gnu.org/licenses/>.
 
 See COPYRIGHT.txt for copyright notices and details.
