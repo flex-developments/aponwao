@@ -14,7 +14,7 @@ Java - Core de aponwao. Funte original de http://www.sinadura.net/
  * zylk.net (http://www.zylk.net/)
 
 Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2010 a través de:
- * Ing. Felix D. Lopez M. - flex.developments en gmail.com | flopez en suscerte.gob.ve
+ * Ing. Félix D. López M. - flex.developments en gmail.com | flopez en suscerte.gob.ve
  * Ing. Yessica De Ascencao - yessicadeascencao en gmail.com | ydeascencao en suscerte.gob.ve
 
 This file is part of Sinadura.
