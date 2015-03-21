@@ -1,0 +1,53 @@
+#!/bin/sh
+########## Variables con su valor por defecto
+origen="$HOME/Firmados"
+destino="$HOME/Firmados"
+fecha=`date +%d-%m-%Y`
+cantidad=$((`ls -l $origen | wc -l`-1))
+respaldo=$HOME/Respaldo\ Firmados/$fecha/$cantidad
+
+########## Opciones por defecto desabilitadas
+backup=false
+
+########## Captura y evaluacion de parametros
+while getopts o:d:br:f:uh "opcion"
+ do
+ 	case $opcion in
+	########## De aqui en adelante se colocan las acciones de los parametros indicados
+		o) origen=$OPTARG;;
+
+		d) destino=$OPTARG;;
+
+		b) backup=true;;
+
+		r) respaldo=$OPTARG;;
+
+		f) fecha=$OPTARG;;
+
+		u) echo "Usage $0 \-[o|d|b|r|f|u|h]"
+		   exit 0;;
+
+		h) echo "\n-o Origen: Directorio origen\n-d Destino: Directorio destino\n-b Backup: Realizar respaldo de duplicados firmados\n-r Respaldo: Nombre del directorio para respaldo\n-f Fecha: Fecha para el directorio de respaldo firmado"
+		   exit 0;;
+
+	########## De aqui en adeñante son opciones por defecto
+		\?) echo "Opción inválida -$OPTARG. Ejecutando '$0 -h' encontrará ayuda."
+		    exit 1;;
+		:) echo "La opción -$OPTARG requiere un argumento. Ejecutando '$0 -h' encontrará ayuda."
+		   exit 1;;
+	esac
+ done
+if [ $# -ge 1 ];then echo "Iniciando Ejecución con argumentos: $*";fi
+
+########## Evaluacion de valores de variables
+
+
+########## Programacion
+rsync -rav "$origen" "$destino"
+if $backup;
+then
+	echo $respaldo
+	mkdir -p "$respaldo"
+	mv "$origen" "$respaldo"
+	mkdir -p "$origen"
+fi
