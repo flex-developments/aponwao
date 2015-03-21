@@ -4,17 +4,17 @@
 Aplicación para firma electrónica de archivos PDF.
 Inicialmente aponwao Versión1 nace como un fork de las primeras versiones de Sinadura (http://www.sinadura.net/es/), sin embargo, actualmente se encuentra en desarrollo la versión 2 cuyo código fuente se escribirá desde cero.
 
-## Dependencias
+# Dependencias
  * ...
- * 
-## Versión 2: Copyright (C) 2015 - Grupo de desarrollo de Aponwao
+
+# Versión 2: Copyright (C) 2015 - Grupo de desarrollo de Aponwao
  * Desarrolladores y Colaboradores de Aponwao (https://github.com/suscerte)
    * Ing. Axel Díaz - diaz.axelio en gmail.com
 
 Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2015 a través de:
  * Ing. Axel Díaz - diaz.axelio en gmail.com | adíaz en suscerte.gob.ve
 
-## Versión 1: Copyright (C) 2008 - zylk.net
+# Versión 1: Copyright (C) 2008 - zylk.net
  * zylk.net (http://www.zylk.net/)
 
 Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2010 a través de:
