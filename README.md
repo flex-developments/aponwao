@@ -6,12 +6,8 @@ Aplicación para firma electrónica de archivos PDF.
 Inicialmente aponwao Versión1 nace como un fork de las primeras versiones de Sinadura (http://www.sinadura.net/es/), sin embargo, actualmente se encuentra en desarrollo la versión 2 cuyo código fuente se escribirá desde cero.
 
 ## Dependencias
-<<<<<<< HEAD
- * ...
-=======
  * rsync (>=3)
  * oracle-java7-installer (>=7)
->>>>>>> java/master
 
 ## Versión 2: Copyright (C) 2015 - Grupo de desarrollo de Aponwao
  * Desarrolladores y Colaboradores de Aponwao (https://github.com/suscerte)
