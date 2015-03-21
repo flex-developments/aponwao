@@ -15,13 +15,9 @@ Java - Core de aponwao. Funte original de http://www.sinadura.net/
 ## Copyright (C) 2008 - zylk.net
  * zylk.net (http://www.zylk.net/)
 
-Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2010 por:
-* Ing. Felix D. Lopez M. - flex.developments en gmail.com | flopez en suscerte.gob.ve
-* Ing. Yessica De Ascencao - yessicadeascencao en gmail.com | ydeascencao en suscerte.gob.ve
-
-Adaptaciones realizadas por:
- * Ing. Felix D. Lopez M. - flex.developments en gmail
- * Ing. Yessica De Ascencao - yessicadeascencao en gmail.com
+Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2010 a través de:
+ * Ing. Felix D. Lopez M. - flex.developments en gmail.com | flopez en suscerte.gob.ve
+ * Ing. Yessica De Ascencao - yessicadeascencao en gmail.com | ydeascencao en suscerte.gob.ve
 
 This file is part of Sinadura.
 
@@ -36,6 +32,6 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Sinadura.  If not, see <http://www.gnu.org/licenses/>. [^]
+along with Sinadura.  If not, see <http://www.gnu.org/licenses/>.
 
 See COPYRIGHT.txt for copyright notices and details.
