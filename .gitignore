@@ -12,5 +12,12 @@
 /develop/lib-aponwaodesktop/nbproject/
 /develop/lib-aponwaodesktop/build.xml
 /develop/lib-aponwaodesktop/manifest.mf
-packer/aponwao/resources/images/Thumbs.db
+/develop/lib-aponwaocore-ng/build/
+/develop/lib-aponwaocore-ng/dist/
+/develop/lib-aponwaocore-ng/lib/CopyLibs/
+/develop/lib-aponwaocore-ng/lib/nblibraries.properties
+/develop/lib-aponwaocore-ng/nbproject/
+/develop/lib-aponwaocore-ng/build.xml
+/develop/lib-aponwaocore-ng/manifest.mf
+/packer/aponwao/resources/images/Thumbs.db
 /packer/aponwao/resources/images/img/Thumbs.db
