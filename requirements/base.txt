@@ -1,0 +1,3 @@
+#PyQt: No in pip
+babel==1.3
+
