@@ -7,7 +7,7 @@ Inicialmente aponwao Versión 1 nace como un fork de las primeras versiones de S
 
 ## Dependencias
  * rsync (>=3)
- * oracle-java7-installer (>=7)
+ * oracle-java7-installer
 
 ## Versión 2: Copyright (C) 2015 - Grupo de desarrollo de Aponwao
  * Desarrolladores y Colaboradores de Aponwao (https://github.com/suscerte)
