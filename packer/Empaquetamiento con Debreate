@@ -1,3 +1,8 @@
+El proceso de empaquetamiento se lleva a cabo una véz han sido sustituídos los archivos que hayan sido modificados dentro de https://github.com/suscerte/aponwao/tree/java/master/packer/aponwao
+
+El proceso de empaquetamiento con debreate se lleva a cabo suministrando la información que solicita la aplicación en sus diversos formularios.
+
+########################## Formulario 1 ###################################
 Package: aponwao
 Version: 1.3
 Maintainer: suscerte.gob.ve
@@ -7,19 +12,18 @@ Priority: optional
 Short Description: Firma Electrónica
 Description: Aplicación para la firma electrónica de documentos PDF basada en sinadura.
 
-###########################################################################
-
+########################## Formulario 2 ###################################
 Depends: rsync (>=3)
 Recommends: oracle-java7-installer (>=7)
 #Recommends: openjdk-7-jre (>=7) | oracle-java7-installer (>=7)
 
-###########################################################################
-
+########################## Formulario 3 ###################################
 Target: /usr/local/aponwao
 
-###########################################################################
+Seleccionar el directorio https://github.com/suscerte/aponwao/tree/java/master/packer/aponwao y agregar a la lista de archivos.
 
-PostInstalacion:
+########################## Formulario 4 ###################################
+----------------------- Ficha PostInstall ---------------------------------
 #!/bin/bash
 clear
 echo "Inicializando archivos en el home........................."
@@ -67,9 +71,7 @@ echo "******************************************************"
 echo ""
 echo "Listo!"
 
-###########################################################################
-
-PostRemove:
+------------------------ Ficha PostRemove ---------------------------------
 #!/bin/bash
 echo "Eliminando enlaces"
 #BORRAR CARPETA DE PROPIEDADES
@@ -86,15 +88,13 @@ do
 done
 echo "Listo!"
 
-###########################################################################
-
+########################## Formulario 5 ###################################
 Name=aponwao
 Version=1.3
 suscerte.gob.ve
 soportedra@suscerte.gob.ve
 
-###########################################################################
-
+########################## Formulario 6 ###################################
 Copyright (C) 2008 - zylk.net
  * zylk.net (http://www.zylk.net/)
 
@@ -123,8 +123,7 @@ along with Sinadura.  If not, see <http://www.gnu.org/licenses/>.
 
 See COPYRIGHT.txt for copyright notices and details.
 
-###########################################################################
-
+########################## Formulario 7 ###################################
 Name=Aponwao
 Type=Application
 Exec=aponwao
