@@ -35,7 +35,7 @@ El proceso de empaquetamiento se lleva a cabo una véz han sido sustituídos los
 
 El proceso de empaquetamiento con debreate se lleva a cabo suministrando la información que solicita la aplicación en sus diversos formularios.
 
-########################## Formulario 1 ###################################
+###### Formulario 1
 Package: aponwao
 Version: 1.3
 Maintainer: suscerte.gob.ve
@@ -45,17 +45,17 @@ Priority: optional
 Short Description: Firma Electrónica
 Description: Aplicación para la firma electrónica de documentos PDF basada en sinadura.
 
-########################## Formulario 2 ###################################
+###### Formulario 2
 Depends: rsync (>=3)
 Recommends: oracle-java7-installer (>=7)
 #Recommends: openjdk-7-jre (>=7) | oracle-java7-installer (>=7)
 
-########################## Formulario 3 ###################################
+###### Formulario 3
 Target: /usr/local/aponwao
 
 Seleccionar el directorio https://github.com/suscerte/aponwao/tree/java/master/packer/aponwao y agregar a la lista de archivos.
 
-########################## Formulario 4 ###################################
+###### Formulario 4
 ----------------------- Ficha PostInstall ---------------------------------
 ```shell
 #!/bin/bash
@@ -124,13 +124,13 @@ done
 echo "Listo!"
 ```
 
-########################## Formulario 5 ###################################
+###### Formulario 5
 Name=aponwao
 Version=1.3
 suscerte.gob.ve
 soportedra@suscerte.gob.ve
 
-########################## Formulario 6 ###################################
+###### Formulario 6
 ```
 Copyright (C) 2008 - zylk.net
  * zylk.net (http://www.zylk.net/)
@@ -161,7 +161,7 @@ along with Sinadura.  If not, see <http://www.gnu.org/licenses/>.
 See COPYRIGHT.txt for copyright notices and details.
 ```
 
-########################## Formulario 7 ###################################
+###### Formulario 7
 Name=Aponwao
 Type=Application
 Exec=aponwao
