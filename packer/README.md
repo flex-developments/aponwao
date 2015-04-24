@@ -48,7 +48,6 @@ Description: Aplicación para la firma electrónica de documentos PDF basada en 
 ###### Formulario 2
 Depends: rsync (>=3)
 Recommends: oracle-java7-installer (>=7)
-#Recommends: openjdk-7-jre (>=7) | oracle-java7-installer (>=7)
 
 ###### Formulario 3
 Target: /usr/local/aponwao
