@@ -58,7 +58,7 @@ Recommends: oracle-java7-installer (>=7)
 ```
 Target: /usr/local/aponwao
 
-Seleccionar el directorio https://github.com/suscerte/aponwao/tree/java/master/packer/aponwao y agregar a la lista de archivos.
+Seleccionar el directorio /packer/aponwao y agregar a la lista de archivos.
 ```
 ###### Formulario 4
 ----------------------- Ficha PostInstall ---------------------------------
