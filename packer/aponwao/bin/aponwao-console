@@ -92,7 +92,7 @@ fi
 CLASSPATH=$CLASSPATH_PREFIX:"$BASEDIR"/etc:"$REPO"/lib-aponwaocore.jar:"$REPO"/itext-2.1.7.jar:"$REPO"/itext-5.1.2.jar:"$REPO"/bcprov-jdk16-146.jar:"$REPO"/bcmail-jdk16-146.jar:"$REPO"/bctsp-jdk16-146.jar:"$REPO"/eSign.jar:"$REPO"/utils.jar
 
 EXTRA_JVM_ARGUMENTS=""
-JAVA_OPTS"-Xmx 512M"
+JAVA_OPTS="-Xmx 512M"
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
