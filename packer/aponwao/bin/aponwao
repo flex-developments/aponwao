@@ -89,7 +89,7 @@ fi
 CLASSPATH=$CLASSPATH_PREFIX:"$BASEDIR"/etc:"$REPO"/lib-aponwaocore.jar:"$REPO"/lib-aponwaodesktop.jar:"$REPO"/commands-3.3.0-I20070605-0010.jar:"$REPO"/izpack-standalone-compiler-4.3.1.jar:"$REPO"/runtime-3.3.100-v20070530.jar:"$REPO"/contenttype-3.2.100-v20070319.jar:"$REPO"/registry-3.3.0-v20070522.jar:"$REPO"/itext-5.1.2.jar:"$REPO"/workbench-3.3.0-I20070608-1100.jar:"$REPO"/osgi-3.3.0-v20070530.jar:"$REPO"/jobs-3.3.0-v20070423.jar:"$REPO"/jface-3.3.0-I20070606-0010.jar:"$REPO"/preferences-3.2.100-v20070522.jar:"$REPO"/help-3.3.0-v20070524.jar:"$REPO"/common-3.3.0-v20070426.jar:"$REPO"/mail.jar:"$REPO"/bcprov-jdk16-146.jar:"$REPO"/bcmail-jdk16-146.jar:"$REPO"/bctsp-jdk16-146.jar:"$REPO"/postgresql-9.1-901.jdbc3.jar:"$REPO"/postgresql-9.1-901.jdbc4.jar:"$REPO"/x86-3.3.0-v3346.jar:"$REPO"/eSign.jar:"$REPO"/utils.jar	
 
 EXTRA_JVM_ARGUMENTS=""
-JAVA_OPTS="-Xmx 1024M"
+JAVA_OPTS="-Xmx1024M"
 
 # For Cygwin, switch paths to Windows format before running java
 if $cygwin; then
