@@ -2,13 +2,23 @@
 Java - Interfáz gráfica de aponwao. Funte original de http://www.sinadura.net/
 
 ## Dependencias
- * itextpdf-v552-nonofficial v010
-   * xmlsec-1.5.2-nonofficial
- * bc-jdk15to17-v150-nonofficial v010
- * lib-flex-pkikeys v010
- * lib-flex-helpers v010
+ * bcmail-jdk16-146
+ * bcprov-jdk16-146
+ * bctsp-jdk16-146
+ * commands-3.3.0-I20070605-0010
+ * common-3.3.0-v20070426
+ * jface-3.3.0-I20070606-0010
+ * mail
+ * postgresql-9.1-901.jdbc3
+ * postgresql-9.1-901.jdbc4
+ * x86-3.3.0-v3346
+ * eSign v010
    * commons-net-3.1
-   * mail
+   * utils v010
+ * itext-5.1.2
+ * lib-aponwaocore
+   * commons-net-3.1
+   * x86-3.3.0-v3346
 
 ## Copyright (C) 2008 - zylk.net
  * zylk.net (http://www.zylk.net/)

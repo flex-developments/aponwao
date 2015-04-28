@@ -55,17 +55,19 @@ import flex.aponwao.gui.sections.preferences.helpers.ImageSignPreferences;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
 import flex.aponwao.gui.sections.preferences.helpers.TimeStampPreferences;
 import flex.eSign.helpers.CertificateHelper;
-import flex.eSign.operators.CertificateVerifierOperator;
-import flex.eSign.operators.components.CertificateVerifierConfig;
-import flex.eSign.operators.components.CertificateVerifierOperatorResults;
-import flex.eSign.operators.exceptions.OCSPFailException;
-import flex.helpers.CSVHelper;
+import flex.eSign.helpers.exceptions.CertificateHelperException;
+import flex.eSign.operators.VerificadorCertificadoOperator;
+import flex.eSign.operators.exceptions.CadenaConfianzaException;
+import flex.eSign.operators.exceptions.CertificadoInvalidoException;
+import flex.eSign.operators.exceptions.CertificadoRevocadoException;
+import flex.eSign.operators.exceptions.OCSPServerException;
+import flex.eSign.operators.exceptions.PrivadaInvalidaException;
+import flex.eSign.operators.exceptions.VerificadorCertificadoException;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyStore;
@@ -77,7 +79,6 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Enumeration;
@@ -95,18 +96,16 @@ import sun.security.pkcs11.wrapper.PKCS11Exception;
 import sun.security.validator.KeyStores;
 
 public class FirmarPDFHelper {
-        private static int DEFAULT_TAMANO_LETRA = 8;
-        private static int DEFAULT_ROTACION_LETRA = 0;
+        private static final int DEFAULT_ROTACION_LETRA = 0;
         
         private static boolean sobreescribir = false;
 	private static final Logger logger = Logger.getLogger(FirmarPDFHelper.class.getName());
 	private static KeyStore ks = null;
 	private static PasswordProtection passwordProtection = null;
-        private static List<String> temp = new ArrayList<String>();
-        public static FileWriter archivo_canaimita = null;
+        private static final List<String> temp = new ArrayList<>();
         
         // diferencial entre el sistema de medición de itext y el de esta pantalla
-        private static final Float RELACION = new Float (1.375816993);
+        private static final Float RELACION = (float) 1.375816993;
         
         //Operaciones sobre Keystore********************************************
 	public static void loadKeyStore(Shell sShell) throws NoSuchAlgorithmException, KeyStoreException, PKCS11Exception, CoreException, CorePKCS12Exception {
@@ -148,7 +147,7 @@ public class FirmarPDFHelper {
 
 	public static List<String> getAlias() {
 		Enumeration<String> aliases = null;
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		try {
 			aliases = ks.aliases();
 			while (aliases.hasMoreElements()) {
@@ -158,7 +157,7 @@ public class FirmarPDFHelper {
 		} catch (KeyStoreException e) {
 			logger.log(Level.SEVERE, "Problemas leyendo los alias de la tarjeta", e);
 		}
-                
+
 		return (list);
 	}
         
@@ -172,36 +171,37 @@ public class FirmarPDFHelper {
         
         //Operaciones sobre el certificado**************************************
         public static void verificarCertificado(String alias) throws SignPDFException {
-            X509Certificate certFirmante;
             try {
-                certFirmante = (X509Certificate) ks.getCertificate(alias);
-            } catch (Exception ex) {
+                X509Certificate certFirmante = (X509Certificate) ks.getCertificate(alias);
+                VerificadorCertificadoOperator.verificarFechas(certFirmante, null);
+                
+                if(PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.VALIDATE_OCSP_ENABLE)){
+                    //Armo lista de certificados a verificar
+                    List<X509Certificate> certificados = new ArrayList<>();
+                    certificados.add(certFirmante);
+
+                    //Obtengo URL OCSP
+                    String ocspURL = CertificateHelper.getURLOCSP(certFirmante).toString();
+
+                    //Armo lista de autoridades
+                    List<X509Certificate> certACs = new ArrayList<>();
+                    Set<X509Certificate> set = KeyStores.getTrustedCerts(PreferencesHelper.getCacheKeystorePreferences());
+                    for (X509Certificate cert : set) certACs.add(cert);
+                    set = null;
+                    System.gc();
+                    try {
+                        VerificadorCertificadoOperator.verificarCadenaYOCSP(certificados, certACs, ocspURL);
+                    } catch (OCSPServerException ex) {
+                        if(PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.VALIDATE_OCSP_VERIFY_ON_ERROR)) throw ex;
+                    }
+                }
+                    
+            } catch (CertificadoInvalidoException | PrivadaInvalidaException | CadenaConfianzaException | CertificadoRevocadoException | OCSPServerException | VerificadorCertificadoException ex) {
+                throw new SignPDFException("", ex);
+                
+            } catch (KeyStoreException | CertificateHelperException ex) {
                 logger.log(Level.SEVERE, "" , ex);
                 throw new SignPDFException("", ex);
-            }
-            
-            List<X509Certificate> certACs = new ArrayList<>();
-            Set<X509Certificate> set = KeyStores.getTrustedCerts(PreferencesHelper.getCacheKeystorePreferences());
-            for (X509Certificate cert : set) certACs.add(cert);
-            set = null;
-
-            //Configurar verificacion para generar una firma
-            CertificateVerifierConfig vcConfigParaFirmar = CertificateVerifierConfig.getInstanceToNewSign(certFirmante, certACs, null, null, true);
-            vcConfigParaFirmar.setVerifyWithOCSP(PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.VALIDATE_OCSP_ENABLE));
-            vcConfigParaFirmar.setTryDownloadCRL(true);
-
-            System.gc();
-            //Verificar para generar una firma
-            CertificateVerifierOperatorResults verificacion = CertificateVerifierOperator.verifyToNewSignature(vcConfigParaFirmar);
-            
-            //Si no se autoriza el certificado
-            if(!verificacion.isAutorized()) {
-                if(verificacion.getCause() instanceof OCSPFailException) {
-                    if(PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.VALIDATE_OCSP_VERIFY_ON_ERROR))
-                        throw new SignPDFException(verificacion.getDetails(), verificacion.getCause());
-                } else {
-                    throw new SignPDFException(verificacion.getDetails(), verificacion.getCause());
-                }
             }
         }
         
@@ -272,7 +272,7 @@ public class FirmarPDFHelper {
         }        
         
         //Información agregable*************************************************
-        private static String addFirmaEstatica(String rutaOrigen, String alias, int correlativo) {
+        private static String addFirmaEstatica(String rutaOrigen, String alias) {
             String rutaDestino = agregarTemp(PreferencesHelper.getPreferences().getString(PreferencesHelper.APPEARANCE_STAMP_STATIC_DIRTEMP) + System.getProperty("file.separator") + "temp1");
 
             try {
@@ -286,10 +286,10 @@ public class FirmarPDFHelper {
                 int pagina = Integer.parseInt(imageStatic.getPage());
                 if (pagina > reader.getNumberOfPages() || pagina<0) pagina = reader.getNumberOfPages();
 
-                Float xAux = new Float(Integer.parseInt(imageStatic.getPosX())*RELACION);
-                Float yAux = new Float(Integer.parseInt(imageStatic.getPosY())*RELACION);
-                Float widthAux = new Float(Integer.parseInt(imageStatic.getWidth())*RELACION);
-                Float heightAux = new Float(Integer.parseInt(imageStatic.getHeight())*RELACION);
+                Float xAux = Integer.parseInt(imageStatic.getPosX())*RELACION;
+                Float yAux = Integer.parseInt(imageStatic.getPosY())*RELACION;
+                Float widthAux = Integer.parseInt(imageStatic.getWidth())*RELACION;
+                Float heightAux = Integer.parseInt(imageStatic.getHeight())*RELACION;
 
                 int width = widthAux.intValue();
                 int height = heightAux.intValue();
@@ -333,40 +333,25 @@ public class FirmarPDFHelper {
                 java.util.Date utilDate = new java.util.Date(); //fecha actual
                 long lnMilisegundos = utilDate.getTime();
                 java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(lnMilisegundos);
-                String time = new SimpleDateFormat("YYYY/MM/dd").format(sqlTimestamp);
-                String fecha = "en fecha "+time;
-                String fechaArchivo = new SimpleDateFormat("YYYY-MM-dd").format(sqlTimestamp);
 
                 if(pagina>0) {
-                    agregarTexto(stamper, "Firmado electrónicamente por", pagina, posX, posY-20, DEFAULT_ROTACION_LETRA, DEFAULT_TAMANO_LETRA);
-                    agregarTexto(stamper, cn, pagina, posX, posY-30, DEFAULT_ROTACION_LETRA, DEFAULT_TAMANO_LETRA);
-                    agregarTexto(stamper, "en fecha "+time, pagina, posX, posY-40, DEFAULT_ROTACION_LETRA, DEFAULT_TAMANO_LETRA);
+                    agregarTexto(stamper, "Firmado electrónicamente por", pagina, posX, posY-20, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
+                    agregarTexto(stamper, cn, pagina, posX, posY-30, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
+                    agregarTexto(stamper, "en fecha "+sqlTimestamp, pagina, posX, posY-40, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
 
                 } else {
                     int total = reader.getNumberOfPages();
                     for(int i=1; i <= total; i++) {
-                        agregarTexto(stamper, "Firmado electrónicamente por", i, posX, posY-20, DEFAULT_ROTACION_LETRA, DEFAULT_TAMANO_LETRA);
-                        agregarTexto(stamper, cn, i, posX, posY-30, DEFAULT_ROTACION_LETRA, DEFAULT_TAMANO_LETRA);
-                        agregarTexto(stamper, fecha, i, posX, posY-40, DEFAULT_ROTACION_LETRA, DEFAULT_TAMANO_LETRA);
+                        agregarTexto(stamper, "Firmado electrónicamente por", i, posX, posY-20, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
+                        agregarTexto(stamper, cn, i, posX, posY-30, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
+                        agregarTexto(stamper, "en fecha "+sqlTimestamp, i, posX, posY-40, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
                     }
                 }
-                
-                if(PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.ARCHIVOS_CANAIMITAS_CREAR)) {
-                    if(archivo_canaimita == null) {
-                        archivo_canaimita = new FileWriter(
-                                PreferencesHelper.getPreferences().getString(PreferencesHelper.ARCHIVOS_CANAIMITAS_PATH) +
-                                File.separator +
-                                ArchivoCanaimita.nombreArchivo +
-                                "_" + fechaArchivo
-                        );
-                    }
-                    CSVHelper.addToOpenCSV(archivo_canaimita, correlativo + CSVHelper.fieldSeparator + cn + CSVHelper.fieldSeparator + fecha + "\n");
-                }
-                
+
                 reader.close();
                 stamper.close();
 
-            } catch (Exception e) {
+            } catch (IOException | DocumentException | NumberFormatException | KeyStoreException e) {
                 logger.log(Level.SEVERE, "", e);
                 Display.getDefault().syncExec(new ProgressWriter(ProgressWriter.ERROR, LanguageResource.getLanguage().getString("error.sign")));
                 rutaDestino = null;
@@ -393,18 +378,18 @@ public class FirmarPDFHelper {
                 
                 //Agregar correlativo ------------------------------------------
                 if(pagina>0) {
-                    agregarTexto(stamper, String.valueOf(correlativo), pagina, posX, posY, DEFAULT_ROTACION_LETRA, DEFAULT_TAMANO_LETRA);
+                    agregarTexto(stamper, String.valueOf(correlativo), pagina, posX, posY, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CORRELATIVO_FONT_SIZE));
 
                 } else {
                     int total = reader.getNumberOfPages();
                     for(pagina=1; pagina <= total; pagina++)
-                        agregarTexto(stamper, String.valueOf(correlativo), pagina, posX, posY, DEFAULT_ROTACION_LETRA, DEFAULT_TAMANO_LETRA);
+                        agregarTexto(stamper, String.valueOf(correlativo), pagina, posX, posY, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CORRELATIVO_FONT_SIZE));
                 }
                 
                 reader.close();
                 stamper.close();
 
-            } catch (Exception e) {
+            } catch (IOException | DocumentException e) {
                 logger.log(Level.SEVERE, "", e);
             }
 
@@ -441,12 +426,12 @@ public class FirmarPDFHelper {
                 
                 //Agregar imagen -----------------------------------------------
                 agregarImagen(stamper, staticImage, pagina, width, height, posX, posY);
-                agregarTexto(stamper, codigo, pagina, 410, 475, DEFAULT_ROTACION_LETRA, DEFAULT_TAMANO_LETRA);
+                agregarTexto(stamper, codigo, pagina, 410, 475, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
 
                 reader.close();
                 stamper.close();
 
-            } catch (Exception e) {
+            } catch (IOException | DocumentException e) {
                 logger.log(Level.SEVERE, "", e);
             }
 
@@ -468,7 +453,7 @@ public class FirmarPDFHelper {
                 if (pagina > reader.getNumberOfPages() || pagina<0) pagina = reader.getNumberOfPages();
                 
                 //Armo coletilla------------------------------------------------
-                List<String> coletilla = new ArrayList<String>();
+                List<String> coletilla = new ArrayList<>();
                 try {
                     File temp = new File(PreferencesHelper.APPEARANCE_COLETILLA_FACTURA_SUFIX_FILE);
                     BufferedReader entrada = new BufferedReader( new FileReader( temp ) );
@@ -543,7 +528,7 @@ public class FirmarPDFHelper {
                 ImageSignPreferences imageStatic = PreferencesHelper.getImagePreferences().get(
 				PreferencesHelper.getPreferences().getString(PreferencesHelper.IMAGE_DISPOSITIVE));
                 if (!imageStatic.getType().equalsIgnoreCase("noimage") && imageStatic.getType().equalsIgnoreCase("simple"))
-                    rutaOrigen = addFirmaEstatica(rutaOrigen, alias, 0);
+                    rutaOrigen = addFirmaEstatica(rutaOrigen, alias);
                 
                 //Agregar coletilla de factura
                 if(PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.APPEARANCE_COLETILLA_FACTURA))
@@ -629,12 +614,12 @@ public class FirmarPDFHelper {
                     ImageSignPreferences imageStatic = PreferencesHelper.getImagePreferences().get(
                             PreferencesHelper.getPreferences().getString(PreferencesHelper.IMAGE_DISPOSITIVE));
                     if (!imageStatic.getType().equalsIgnoreCase("noimage") && imageStatic.getType().equalsIgnoreCase("simple"))
-                        rutaOrigen = addFirmaEstatica(rutaOrigen, alias, correlativo);
+                        rutaOrigen = addFirmaEstatica(rutaOrigen, alias);
 
                     //Agregar Correlativo
                     //OJO... Preguntar por la pagina y preguntar si desea agregar el correlativo
                     if (PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.APPEARANCE_CORRELATIVO_ENABLE))
-                        rutaOrigen = addCorrelativo(rutaOrigen, correlativo, 1);
+                        rutaOrigen = addCorrelativo(rutaOrigen, correlativo, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CORRELATIVO_PAGE));
 
                     //Agregar Codigo de Barras
                     //OJO... Preguntar por la pagina
@@ -645,7 +630,7 @@ public class FirmarPDFHelper {
 
                     cont++;
                 }
-                
+
                 respaldar(pdfParameter.getOrigen(), carpetaRespaldo);
                 limpiarTemporales();
                 seriales.clear(); seriales = null;
@@ -664,6 +649,7 @@ public class FirmarPDFHelper {
         public static void finalizarFirma(String rutaOrigen, String alias, String rutaDestinoDef) throws SignPDFException, IOException {
             try {
                 // TODO si tiene password??? -> preguntar pass
+                System.out.println("ruta destino: "+rutaDestinoDef);
                 String rutaDestino = rutaDestinoDef;
                 if(sobreescribir) rutaDestino = rutaDestino + ".temp";
                 
@@ -837,11 +823,6 @@ public class FirmarPDFHelper {
         
         public static void limpiarTemporales() {
             for(String ruta : temp) ExportHelper.deleteFile(ruta);
-            try {
-                if(archivo_canaimita != null) archivo_canaimita.close();
-            } catch(IOException ex) {
-              ex.printStackTrace();
-            }
         }
         
         //Otras operaciones ****************************************************

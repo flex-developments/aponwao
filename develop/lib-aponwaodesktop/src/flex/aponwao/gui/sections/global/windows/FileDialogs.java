@@ -91,17 +91,6 @@ public class FileDialogs {
 		return selectedFile;
 	}
 	
-        public static String openFolderDialog(Shell sShell) {
-		DirectoryDialog dirDialog = new DirectoryDialog(sShell, SWT.OPEN);
-		dirDialog.setFilterPath(PreferencesHelper.getPreferences().getString(PreferencesHelper.FILEDIALOG_PATH));
-		dirDialog.setText(LanguageResource.getLanguage().getString("open.dialog.title"));
-		String dir = dirDialog.open();
-		PreferencesHelper.getPreferences().setValue(PreferencesHelper.FILEDIALOG_PATH, dirDialog.getFilterPath());
-		PreferencesHelper.savePreferences();
-		
-		return dir;
-	}
-        
 	// multiple files
 	public static List<File> openFilesDialog(Shell sShell, String tipo) {
 

@@ -1,7 +1,6 @@
 package flex.aponwao.gui.application;
 
 import flex.eSign.helpers.CertificateHelper;
-import flex.eSign.helpers.exceptions.CertificateHelperException;
 import java.security.cert.CertPathValidatorException;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
@@ -77,7 +76,7 @@ public final class PDFSignatureInfo {
 		}
 	}
 
-	public String getSignerLocalizedDescription() throws CertificateHelperException {
+	public String getSignerLocalizedDescription() {
 	
 		
 		String m = "";

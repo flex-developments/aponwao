@@ -88,7 +88,7 @@ public class TrustedCertsPreferences extends FieldEditorPreferencePage {
 		super(FLAT);
 		
 		// inicializo la lista
-		aliasesPosition = new ArrayList<>();
+		aliasesPosition = new ArrayList<String>();
 		
 		// hago una copia del keystore
 		Set<X509Certificate> set = KeyStores.getTrustedCerts(PreferencesHelper.getTrustedKeystorePreferences());
@@ -102,7 +102,11 @@ public class TrustedCertsPreferences extends FieldEditorPreferencePage {
 		try {
 			ksTemp.load(null, null);
 			
-		} catch (NoSuchAlgorithmException | CertificateException | IOException e) {
+		} catch (NoSuchAlgorithmException e) {
+			logger.log(Level.SEVERE, "", e);
+		} catch (CertificateException e) {
+			logger.log(Level.SEVERE, "", e);
+		} catch (IOException e) {
 			logger.log(Level.SEVERE, "", e);
 		}
 		

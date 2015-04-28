@@ -35,12 +35,11 @@ import flex.aponwao.gui.sections.main.helpers.FirmarPDFHelper;
 import flex.aponwao.gui.sections.main.windows.AliasDialog;
 import flex.aponwao.gui.sections.main.windows.TablePDF;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
-import flex.eSign.helpers.exceptions.CertificateHelperException;
-import flex.eSign.operators.exceptions.TrustPathException;
-import flex.eSign.operators.exceptions.InvalidCertificateException;
-import flex.eSign.operators.exceptions.OCSPFailException;
-import flex.eSign.operators.exceptions.PrivateKeyInvalidException;
-import flex.eSign.operators.exceptions.RevokedCertificateException;
+import flex.eSign.operators.exceptions.CadenaConfianzaException;
+import flex.eSign.operators.exceptions.CertificadoInvalidoException;
+import flex.eSign.operators.exceptions.CertificadoRevocadoException;
+import flex.eSign.operators.exceptions.OCSPServerException;
+import flex.eSign.operators.exceptions.PrivadaInvalidaException;
 import java.lang.reflect.InvocationTargetException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -82,11 +81,7 @@ public class FirmarPDFListener implements SelectionListener {
 	
         @Override
 	public void widgetSelected(SelectionEvent event) {
-            try {
-                firmarPDF();
-            } catch (CertificateHelperException ex) {
-                Logger.getLogger(FirmarPDFListener.class.getName()).log(Level.SEVERE, null, ex);
-            }
+		firmarPDF();
 	}
 
         @Override
@@ -94,7 +89,7 @@ public class FirmarPDFListener implements SelectionListener {
 		widgetSelected(event);
 	}
         
-        public void firmarPDF() throws CertificateHelperException {
+        public void firmarPDF() {
             if (!tablePDF.getSelectedPDFs().isEmpty()) {
                 if(!ksloaded) {
                     try {
@@ -142,29 +137,23 @@ public class FirmarPDFListener implements SelectionListener {
                             return;
                     }
                 }
-                //Listo alias del KeyStore
+                //Si el keystore tiene más de un alias selecciono uno de ellos
                 String alias = null;
                 String selectedAlias = null;
-                List<String> aliases = FirmarPDFHelper.getAlias();
-                
-                if (aliases.size() == 0) {
-                    //Si no consigue alias lanza el error
-                    String m = LanguageResource.getLanguage().getString("error.cargar_store.vacio");
-                    logger.log(Level.SEVERE, m, new KeyStoreException(m));
-                    LoggingDesktopController.printError(m);
-                    return;
-                
-                } else if (aliases.size() == 1) {
-                    //Si tiene una sola es seleccionada inmediatamente
-                    alias = aliases.get(0);
-                    
-                } else if (aliases.size() > 1) {
-                    //Si tiene más de un alias se muestra un dialogo de seleccion
-                    AliasDialog solicitarAliasDialog = new AliasDialog(tablePDF.getShell());
-                    selectedAlias = solicitarAliasDialog.open(aliases);
 
-                    if (selectedAlias == null) return;
-                    else alias = selectedAlias;
+                List<String> aliases = FirmarPDFHelper.getAlias();
+
+                if (aliases.size() > 1) {
+                        AliasDialog solicitarAliasDialog = new AliasDialog(tablePDF.getShell());
+                        selectedAlias = solicitarAliasDialog.open(aliases);
+
+                        if (selectedAlias == null) {
+                                return;
+                        } else {
+                                alias = selectedAlias;
+                        }
+                } else {
+                        alias = aliases.get(0);
                 }
                 
                 // barra con el proceso de firma de los PDF
@@ -175,46 +164,44 @@ public class FirmarPDFListener implements SelectionListener {
                     } catch (SignPDFException ex) {
                             logger.log(Level.SEVERE, "en el proceso de firma.", ex);
 
-                            if (ex.getCause() instanceof InvalidCertificateException) {
+                            if (ex.getCause() instanceof CertificadoInvalidoException) {
                                 // si la causa es una exception de certificado invalido
                                 String m = MessageFormat.format(
                                         LanguageResource.getLanguage().getString("error.certificate.invalid"),
-                                        ((InvalidCertificateException)ex.getCause()).getVerifyMethod()
+                                        ((CertificadoInvalidoException)ex.getCause()).getMetodoVerificacion()
                                 );
                                 logger.log(Level.SEVERE, m, ex);
                                 LoggingDesktopController.printError(m);
 
-                            } else if (ex.getCause() instanceof PrivateKeyInvalidException) {
+                            } else if (ex.getCause() instanceof PrivadaInvalidaException) {
                                 //si la causa es una exception de privada invalida            
                                 String m = MessageFormat.format(
                                         LanguageResource.getLanguage().getString("error.private.key.invalid"),
-                                        ((PrivateKeyInvalidException)ex.getCause()).getVerifyMethod()
+                                        ((PrivadaInvalidaException)ex.getCause()).getMetodoVerificacion()
                                 );
                                 logger.log(Level.SEVERE, m, ex);
                                 LoggingDesktopController.printError(m);
 
-                            } else if (ex.getCause() instanceof TrustPathException) {
+                            } else if (ex.getCause() instanceof CadenaConfianzaException) {
                                 // si la causa es una exception de certificado revocado
                                 String m = LanguageResource.getLanguage().getString("error.certificate.path");
                                 logger.log(Level.SEVERE, m, ex);
                                 LoggingDesktopController.printError(m);
-                                
-                            } else if (ex.getCause() instanceof RevokedCertificateException) {
+
+                            } else if (ex.getCause() instanceof CertificadoRevocadoException) {
                                 // si la causa es una exception de certificado revocado
-                                String m = ((RevokedCertificateException)ex.getCause()).getMessage();
-                                        MessageFormat.format(
+                                String m = MessageFormat.format(
                                         LanguageResource.getLanguage().getString("error.certificate.revoked"),
-                                        ((RevokedCertificateException)ex.getCause()).getVerificationMethod()
+                                        ((CertificadoRevocadoException)ex.getCause()).getMetodoVerificacion()
                                 );
                                 logger.log(Level.SEVERE, m, ex);
                                 LoggingDesktopController.printError(m);
 
-                            } else if (ex.getCause() instanceof OCSPFailException) {
+                            } else if (ex.getCause() instanceof OCSPServerException) {
                                 // si la causa es una exception de certificado revocado
                                 String m = LanguageResource.getLanguage().getString("error.certificate.ocsp_error");
                                 logger.log(Level.SEVERE, m, ex);
                                 LoggingDesktopController.printError(m);
-                            
                             }
                             throw new InvocationTargetException(ex.getCause());
                     }

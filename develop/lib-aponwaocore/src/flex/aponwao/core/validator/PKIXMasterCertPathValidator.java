@@ -30,7 +30,7 @@ import java.security.cert.CertPathValidatorException;
 class PKIXMasterCertPathValidator {
  
     private static final Debug debug = Debug.getInstance("certpath");
-    private List certPathCheckers;
+    private final List certPathCheckers;
 
     /** 
      * Initializes the list of PKIXCertPathCheckers whose checks

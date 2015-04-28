@@ -8,18 +8,26 @@
 package flex.aponwao.core.validator;
 
 import java.math.BigInteger;
+import java.security.InvalidKeyException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.cert.PKIXCertPathChecker;
 import java.security.cert.CertPathValidatorException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.interfaces.DSAParams;
 import java.security.interfaces.DSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
+import java.security.spec.InvalidKeySpecException;
 import javax.security.auth.x500.X500Principal;
 import sun.security.x509.X500Name;
 import sun.security.util.Debug;
@@ -33,7 +41,7 @@ import sun.security.util.Debug;
  * @since	1.4
  * @author	Yassir Elley
  */
-class BasicChecker extends PKIXCertPathChecker {
+final class BasicChecker extends PKIXCertPathChecker {
  
     private static final Debug debug = Debug.getInstance("certpath");
     private final PublicKey trustedPubKey;
@@ -71,6 +79,7 @@ class BasicChecker extends PKIXCertPathChecker {
      * Initializes the internal state of the checker from parameters
      * specified in the constructor.
      */
+    @Override
     public void init(boolean forward) throws CertPathValidatorException {
 	if (!forward) {
 	    prevPubKey = trustedPubKey;
@@ -81,10 +90,12 @@ class BasicChecker extends PKIXCertPathChecker {
 	}
     }
 
+    @Override
     public boolean isForwardCheckingSupported() {
 	return false;
     }
 
+    @Override
     public Set<String> getSupportedExtensions() {
 	return null;
     }
@@ -100,6 +111,7 @@ class BasicChecker extends PKIXCertPathChecker {
      * @exception CertPathValidatorException Exception thrown if certificate
      * does not verify.
      */
+    @Override
     public void check(Certificate cert, Collection<String> unresolvedCritExts) 
         throws CertPathValidatorException
     {
@@ -131,7 +143,7 @@ class BasicChecker extends PKIXCertPathChecker {
 
 	try {
 	    cert.verify(prevPubKey, sigProvider);
-	} catch (Exception e) {
+	} catch (CertificateException | NoSuchAlgorithmException | InvalidKeyException | NoSuchProviderException | SignatureException e) {
 	    if (debug != null) {
 	    	debug.println(e.getMessage());
 	    	e.printStackTrace();
@@ -155,7 +167,7 @@ class BasicChecker extends PKIXCertPathChecker {
 
 	try {
 	    cert.checkValidity(date);
-	} catch (Exception e) {
+	} catch (CertificateExpiredException | CertificateNotYetValidException e) {
 	    if (debug != null) {
 	    	debug.println(e.getMessage());
 	    	e.printStackTrace();
@@ -249,7 +261,7 @@ class BasicChecker extends PKIXCertPathChecker {
                                                        params.getQ(),
                                                        params.getG());
             usableKey = kf.generatePublic(ks);
-        } catch (Exception e) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new CertPathValidatorException("Unable to generate key with" +
                                                  " inherited parameters: " +
                                                  e.getMessage(), e); 

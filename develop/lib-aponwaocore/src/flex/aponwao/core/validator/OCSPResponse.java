@@ -10,6 +10,7 @@ package flex.aponwao.core.validator;
 import java.io.*;
 import java.security.*;
 import java.security.cert.CertPathValidatorException;
+import java.security.cert.CertificateException;
 import java.security.cert.TrustAnchor;
 import java.security.cert.X509Certificate;
 import java.security.cert.PKIXParameters;
@@ -134,6 +135,7 @@ class OCSPResponse {
      * Create an OCSP response from its ASN.1 DER encoding.
      */
     // used by OCSPChecker
+    @SuppressWarnings("empty-statement")
     OCSPResponse(byte[] bytes, PKIXParameters params,
 	X509Certificate responderCert)
 	throws IOException, CertPathValidatorException {
@@ -403,7 +405,7 @@ class OCSPResponse {
 	    }
 	} catch (CertPathValidatorException cpve) {
 	    throw cpve;
-	} catch (Exception e) {
+	} catch (IOException | CertificateException | SignatureException e) {
 	    throw new CertPathValidatorException(e);
 	}
     } 
@@ -435,11 +437,9 @@ class OCSPResponse {
 		}
 		return false;
 	    }
-	} catch (InvalidKeyException ike) {
+	} catch (InvalidKeyException | NoSuchAlgorithmException ike) {
 	    throw new SignatureException(ike);
 
-	} catch (NoSuchAlgorithmException nsae) {
-	    throw new SignatureException(nsae);
 	}
     }
 	

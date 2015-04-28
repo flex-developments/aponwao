@@ -46,6 +46,7 @@ public class ConsoleCallbackHandler implements CallbackHandler, PasswordExtracto
         this.passwordProtection = new KeyStore.PasswordProtection(pin_s.toCharArray());
     }
     
+    @Override
     public PasswordProtection getPasswordProtection() {
         return this.passwordProtection;
     }	

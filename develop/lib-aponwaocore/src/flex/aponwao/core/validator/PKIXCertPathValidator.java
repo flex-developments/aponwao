@@ -108,7 +108,7 @@ public class PKIXCertPathValidator extends CertPathValidatorSpi {
 
 	// Must copy elements of certList into a new modifiable List before
 	// calling Collections.reverse().
-	List<X509Certificate> certList = new ArrayList<X509Certificate>
+	List<X509Certificate> certList = new ArrayList<>
 	    ((List<X509Certificate>)cp.getCertificates());
 	if (debug != null) {
 	    if (certList.isEmpty()) {
@@ -254,7 +254,7 @@ public class PKIXCertPathValidator extends CertPathValidatorSpi {
 	    throws CertPathValidatorException
     {
 	List<PKIXCertPathChecker> certPathCheckers = 
-	    new ArrayList<PKIXCertPathChecker>();
+	    new ArrayList<>();
 	
 	int certPathLen = certList.size();
 	
@@ -286,6 +286,7 @@ public class PKIXCertPathValidator extends CertPathValidatorSpi {
 	    // Examine OCSP security property 
 	    String ocspProperty = (String) AccessController.doPrivileged(
 		new PrivilegedAction() {
+                    @Override
 		    public Object run() {
 			return 
 			    Security.getProperty(OCSPChecker.OCSP_ENABLE_PROP);
@@ -294,6 +295,7 @@ public class PKIXCertPathValidator extends CertPathValidatorSpi {
 
             String onlyEECertProp = (String) AccessController.doPrivileged(
                 new PrivilegedAction() {
+                    @Override
                     public Object run() {
                         return Security.getProperty
                             ("com.sun.security.onlyCheckRevocationOfEECert");

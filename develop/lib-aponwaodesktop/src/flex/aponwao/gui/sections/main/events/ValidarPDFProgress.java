@@ -16,7 +16,6 @@ import flex.aponwao.gui.application.PDFInfo;
 import flex.aponwao.gui.application.PDFSignatureInfo;
 import flex.aponwao.gui.exceptions.DocumentValidationException;
 import flex.aponwao.gui.sections.main.helpers.ValidarPDFHelper;
-import flex.eSign.helpers.exceptions.CertificateHelperException;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -64,13 +63,10 @@ public class ValidarPDFProgress implements IRunnableWithProgress {
                                                 if (pdfSignaturesListAux.size() > 0){
                                                     if (pdfSignaturesListAux.get(i).getSignerSimpleStatus() == PDFSignatureInfo.SIMPLE_STATUS_VALID) {
                                                         m = m + " " + LanguageResource.getLanguage().getString("info.certificate.dependable");
-                                                        
                                                     } else if (pdfSignaturesListAux.get(i).getSignerSimpleStatus() == PDFSignatureInfo.SIMPLE_STATUS_ERROR) {
                                                         m = m + " " + LanguageResource.getLanguage().getString("info.certificate.unknown");
-                                                        
                                                     } else if (pdfSignaturesListAux.get(i).getSignerSimpleStatus() == PDFSignatureInfo.SIMPLE_STATUS_INVALID) {
                                                         m = m + " " + LanguageResource.getLanguage().getString("info.signature.invalid");
-                                                        
                                                     } else {
                                                         m = m + " " + LanguageResource.getLanguage().getString("info.certificate.warning");
                                                     }
@@ -159,9 +155,7 @@ public class ValidarPDFProgress implements IRunnableWithProgress {
 							temp.getName(), e.getCause().toString());
 					logger.log(Level.SEVERE, m, e);
 					Display.getDefault().syncExec(new ProgressWriter(ProgressWriter.ERROR, m));
-				} catch (CertificateHelperException ex) {
-                                Logger.getLogger(ValidarPDFProgress.class.getName()).log(Level.SEVERE, null, ex);
-                            }
+				}
 				
 			} else {
 				

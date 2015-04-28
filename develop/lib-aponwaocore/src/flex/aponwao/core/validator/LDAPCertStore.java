@@ -164,6 +164,7 @@ public class LDAPCertStore extends CertStoreSpi {
      * @param params the algorithm parameters
      * @exception InvalidAlgorithmParameterException if params is not an
      *   instance of <code>LDAPCertStoreParameters</code>
+     * @throws java.security.cert.CertificateException
      */
     public LDAPCertStore(CertStoreParameters params)
 	    throws InvalidAlgorithmParameterException, CertificateException {
@@ -222,7 +223,7 @@ public class LDAPCertStore extends CertStoreSpi {
     private void createInitialDirContext(String server, int port) 
 	    throws InvalidAlgorithmParameterException {
 	String url = "ldap://" + server + ":" + port;
-	Hashtable<String,Object> env = new Hashtable<String,Object>();
+	Hashtable<String,Object> env = new Hashtable<>();
 	env.put(Context.INITIAL_CONTEXT_FACTORY,
 		"com.sun.jndi.ldap.LdapCtxFactory");
 	env.put(Context.PROVIDER_URL, url);
@@ -557,6 +558,7 @@ public class LDAPCertStore extends CertStoreSpi {
      *         match the specified selector
      * @throws CertStoreException if an exception occurs 
      */
+    @Override
     public synchronized Collection<X509Certificate> engineGetCertificates
 	    (CertSelector selector) throws CertStoreException {
 	if (debug != null) {
@@ -858,6 +860,7 @@ public class LDAPCertStore extends CertStoreSpi {
         SunLDAPCertStoreParameters() {
 	    super();
 	}
+        @Override
         public boolean equals(Object obj) {
 	    if (!(obj instanceof LDAPCertStoreParameters)) {
 		return false;
@@ -866,6 +869,7 @@ public class LDAPCertStore extends CertStoreSpi {
             return (getPort() == params.getPort() && 
 		    getServerName().equalsIgnoreCase(params.getServerName()));
 	}
+        @Override
 	public int hashCode() {
 	    if (hashCode == 0) {
 		int result = 17;
@@ -923,6 +927,7 @@ public class LDAPCertStore extends CertStoreSpi {
 
 	private Collection<X500Principal> certIssuers;
 
+        @Override
 	public boolean match(CRL crl) {
 	    Collection<X500Principal> issuers = getIssuers();
 	    // temporarily set the issuer criterion to the certIssuers

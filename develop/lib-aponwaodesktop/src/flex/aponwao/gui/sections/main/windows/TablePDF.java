@@ -22,6 +22,8 @@
 
 package flex.aponwao.gui.sections.main.windows;
 
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.PdfReader;
 import flex.aponwao.gui.application.ImagesResource;
 import flex.aponwao.gui.application.LanguageResource;
 import flex.aponwao.gui.application.LoggingDesktopController;
@@ -32,8 +34,8 @@ import flex.aponwao.gui.sections.global.windows.InfoDialog;
 import flex.aponwao.gui.sections.main.helpers.ValidarPDFHelper;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
 import flex.eSign.helpers.CertificateHelper;
-import flex.eSign.helpers.exceptions.CertificateHelperException;
 import java.io.File;
+import java.io.IOException;
 import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -146,11 +148,7 @@ public class TablePDF extends Composite {
 
 						PDFSignatureInfo sigInfo = ((PDFInfo)item.getData()).getSignatures().get(0);
 						InfoDialog id = new InfoDialog(tree.getShell());
-                                            try {
-                                                id.open(sigInfo.getSignerLocalizedDescription());
-                                            } catch (CertificateHelperException ex) {
-                                                Logger.getLogger(TablePDF.class.getName()).log(Level.SEVERE, null, ex);
-                                            }
+						id.open(sigInfo.getSignerLocalizedDescription());
 						return;
 					}
 
@@ -175,11 +173,7 @@ public class TablePDF extends Composite {
 
 							PDFSignatureInfo sigInfo = ((PDFInfo)item.getData()).getSignatures().get(j+1);
 							InfoDialog id = new InfoDialog(tree.getShell());
-                                                    try {
-                                                        id.open(sigInfo.getSignerLocalizedDescription());
-                                                    } catch (CertificateHelperException ex) {
-                                                        Logger.getLogger(TablePDF.class.getName()).log(Level.SEVERE, null, ex);
-                                                    }
+							id.open(sigInfo.getSignerLocalizedDescription());
 							return;
 						}
 
@@ -263,7 +257,7 @@ public class TablePDF extends Composite {
 
 	}
 
-	public void reloadTable() throws CertificateHelperException {
+	public void reloadTable() {
 
                 List<PDFInfo> listPdfReaderSign = getPdfReaderSignList();
                 this.tree.removeAll();
@@ -360,7 +354,7 @@ public class TablePDF extends Composite {
 		return (list);
 	}
         
-	public void setPdfReaderSignList(List<PDFInfo> list) throws CertificateHelperException {
+	public void setPdfReaderSignList(List<PDFInfo> list) {
             if (list.size() > 0){
                 
                     if (list.get(list.size()-1).getDir() && !PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.VIEW_CONTENT_FOLDER)){
@@ -419,7 +413,7 @@ public class TablePDF extends Composite {
                }
 	}
 
-	public void populateItem(TreeItem item, PDFSignatureInfo signature) throws CertificateHelperException {
+	public void populateItem(TreeItem item, PDFSignatureInfo signature) {
 
 		item.setText(2, signature.getName());
 
@@ -467,7 +461,7 @@ public class TablePDF extends Composite {
 	}
 
 	// TODO esto deberia de estar fuera de este componente (con setters)
-	public void addFiles (boolean dir) throws CertificateHelperException {
+	public void addFiles (boolean dir) {
             
                 List<File> fileList = null;
                 List<PDFInfo> listPdfReaderSign = null;
@@ -508,7 +502,7 @@ public class TablePDF extends Composite {
 	}
         
         //OJO... Modificacion Felix
-        public void addFilesFromFolder (boolean dir, String ruta) throws CertificateHelperException {
+        public void addFilesFromFolder (boolean dir, String ruta) {
 
                 List<File> fileList = null;
                 if (dir)
@@ -543,37 +537,38 @@ public class TablePDF extends Composite {
                                     String function, String user, String pass,
                                     String campoOrigen, String campoDestino,
                                     String usuSistema, String passwordSistema,
-                                    int userType) throws CertificateHelperException {
+                                    int userType) {
             
-                List<String> path = new ArrayList<>();
-                List<String> destination = new ArrayList<>();
+                List<String> path = new ArrayList<String>();
+                List<String> destination = new ArrayList<String>();
                 
                 try{
                     Class.forName(driver);
-                    try (Connection con = DriverManager.getConnection(url+dbname, user, pass)) {
-                        Statement stmt = con.createStatement();
-                        ResultSet rs = stmt.executeQuery("select * from " + function + "('" + usuSistema + "','" + passwordSistema + "'," + userType + ")");
-                        while (rs.next()){
-                            String origen = rs.getString(campoOrigen);
-                            String destino = rs.getString(campoDestino);
-                            
-                            path.add(origen);
-                            destination.add(destino);
-                        }
-                        stmt.close();
+                    Connection con = DriverManager.getConnection(url+dbname, user, pass);
+                    Statement stmt = con.createStatement();
+                    ResultSet rs = stmt.executeQuery("select * from " + function + "('" + usuSistema + "','" + passwordSistema + "'," + userType + ")");
+//                    ResultSet rs = stmt.executeQuery("select * from " + function);
+                    while (rs.next()){
+                        String origen = rs.getString(campoOrigen);
+                        String destino = rs.getString(campoDestino);
+                        
+                        path.add(origen);
+                        destination.add(destino);
                     }
+                    stmt.close();
+                    con.close();
 
                 } catch(Exception e) {
                     InfoDialog id = new InfoDialog(tree.getShell());
                     id.open(e.getLocalizedMessage());
                 }
                 
-                List<PDFInfo> listPdfReaderSign = getPdfReaderSignList();                
+                List<PDFInfo> listPdfReaderSign = getPdfReaderSignList();
+
                 for (int x=0; x< path.size(); x++) {
                         PDFInfo pdfReaderSign = new PDFInfo();
                         pdfReaderSign.setOrigen(path.get(x));
                         pdfReaderSign.setDestino(destination.get(x));
-                        pdfReaderSign.setDir(true);
                         listPdfReaderSign.add(pdfReaderSign);
                 }
 

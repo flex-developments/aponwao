@@ -122,41 +122,29 @@ public class KeyStoreBuilderFactory
 		{
 			o = o.getCause();
 		}
-		//una vez que he llegado a la excepción origen, la lanzo para no perder su información en la traza
-		if(o.getClass().getName().equals("sun.security.pkcs11.wrapper.PKCS11Exception"))
-		{
-			throw (PKCS11Exception)o;
-		}
-		else if(o.getClass().getName().equals("java.security.NoSuchAlgorithmException"))
-		{
-			throw (NoSuchAlgorithmException)o;
-		}
-		else if(o.getClass().getName().equals("java.security.ProviderException"))
-		{
-			throw new CoreException((ProviderException)o);
-		}
-		else if(o.getClass().getName().equals("java.io.IOException"))
-		{	
-			throw new CoreException((IOException)o);
-		}
-		else if(o.getClass().getName().equals("javax.crypto.BadPaddingException"))
-		{	
-			throw new CorePKCS12Exception((BadPaddingException)o);
-		}
+            //una vez que he llegado a la excepción origen, la lanzo para no perder su información en la traza
+            switch (o.getClass().getName()) {
+                case "sun.security.pkcs11.wrapper.PKCS11Exception":
+                    throw (PKCS11Exception)o;
+                case "java.security.NoSuchAlgorithmException":
+                    throw (NoSuchAlgorithmException)o;
+                case "java.security.ProviderException":
+                    throw new CoreException((ProviderException)o);
+                case "java.io.IOException":
+                    throw new CoreException((IOException)o);
+                case "javax.crypto.BadPaddingException":
+                    throw new CorePKCS12Exception((BadPaddingException)o);
+            }
 		
-		//si no es de tipo PKCS11 o NoSuchAlgorithmException devuelvo la de entrada
-		if(origin.getClass().getName().equals("java.security.KeyStoreException"))
-		{
-			throw (KeyStoreException) origin;
-		}
-		else if(origin.getClass().getName().equals("java.lang.RuntimeException"))
-		{
-			throw (RuntimeException) origin;
-		}
-		else
-		{
-			throw (RuntimeException) origin;
-		}
+            //si no es de tipo PKCS11 o NoSuchAlgorithmException devuelvo la de entrada
+            switch (origin.getClass().getName()) {
+                case "java.security.KeyStoreException":
+                    throw (KeyStoreException) origin;
+                case "java.lang.RuntimeException":
+                    throw (RuntimeException) origin;
+                default:
+                    throw (RuntimeException) origin;
+            }
 		
 	}
 }

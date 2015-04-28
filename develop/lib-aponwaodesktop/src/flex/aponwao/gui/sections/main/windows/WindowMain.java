@@ -6,7 +6,6 @@ import flex.aponwao.gui.application.LoggingDesktopController;
 import flex.aponwao.gui.application.ResourceHelper;
 import flex.aponwao.gui.sections.global.windows.InfoDialog;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
-import flex.eSign.helpers.exceptions.CertificateHelperException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.eclipse.swt.SWT;
@@ -23,7 +22,7 @@ public class WindowMain {
 
 	private static Logger logger = Logger.getLogger(WindowMain.class.getName());
 	
-	public WindowMain () throws CertificateHelperException {
+	public WindowMain () {
 		//Display.setAppName(ResourceHelper.APPLICATION_TITLE);
                 //OJO... Modificacion Yesica
                 Display.setAppName(PreferencesHelper.getPreferences().getString(PreferencesHelper.APPEARANCE_TITLE));

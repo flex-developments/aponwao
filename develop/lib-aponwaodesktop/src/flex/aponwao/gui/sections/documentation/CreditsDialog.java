@@ -35,7 +35,7 @@ public class CreditsDialog extends Dialog {
 	private static final String ALFREDO_SANCHEZ = "Alfredo Sánchez Blanco \t asanchez@zylk.net";
 	private static final String ELOY_GARCIA_BORREGUERO = "Eloy García-Borreguero Melero \t egarcia@zylk.net";
         
-        private static final String FELIX_LOPEZ = "Félix López \t flex.developments@gmail.com";
+        private static final String FELIX_LOPEZ = "Félix López \t fdmarchena2003@hotmail.com";
         private static final String YESSICA_DE_ASCENCAO = "Yessica De Ascencao \t y@hotmail.com";
 	
 	private Shell sShell;

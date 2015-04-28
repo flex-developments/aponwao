@@ -13,7 +13,6 @@ import flex.aponwao.gui.sections.main.helpers.EnviarPDFHelper;
 import flex.aponwao.gui.sections.main.windows.AliasDialog;
 import flex.aponwao.gui.sections.main.windows.TablePDF;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
-import flex.eSign.helpers.exceptions.CertificateHelperException;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.security.KeyStoreException;
@@ -50,12 +49,8 @@ public class EnviarPDFListener implements SelectionListener {
     public void widgetSelected(SelectionEvent event) {
         if (!tablePDF.getSelectedPDFs().isEmpty()) {
             if(PreferencesHelper.getPreferences().getString(PreferencesHelper.EMAIL_CLIENT).toUpperCase().equals(PreferencesHelper.EMAIL_CLIENT_APONWAO)) {
-                try {
-                    //Envio los correos directamente desde java
-                    enviar();
-                } catch (CertificateHelperException ex) {
-                    Logger.getLogger(EnviarPDFListener.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                //Envio los correos directamente desde java
+                enviar();
             } else {
                 //Llamo al cliente de correo
                 DesktopHelper.openDefaultMailClient(getAdjuntos());
@@ -92,7 +87,7 @@ public class EnviarPDFListener implements SelectionListener {
         return adjuntos;
     }
     
-    public void enviar() throws CertificateHelperException {
+    public void enviar() {
         String alias = null;
         
         if(PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.EMAIL_SIGN)) {

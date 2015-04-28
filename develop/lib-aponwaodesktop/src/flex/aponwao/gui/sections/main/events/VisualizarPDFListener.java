@@ -2,12 +2,14 @@ package flex.aponwao.gui.sections.main.events;
 
 
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
+import flex.aponwao.gui.application.DesktopHelper;
 import flex.aponwao.gui.application.LanguageResource;
 import flex.aponwao.gui.application.LoggingDesktopController;
 import flex.aponwao.gui.application.PDFInfo;
 import flex.aponwao.gui.sections.main.windows.TablePDF;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
-import flex.helpers.SystemHelper;
 
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -40,9 +42,9 @@ public class VisualizarPDFListener implements SelectionListener {
                             String os = System.getProperty("os.name");
                             os = os.substring(0, 3);
 
-                            if(SystemHelper.isWindows()) {
+                            if(os.contentEquals("Win")){
                                 p = Runtime.getRuntime().exec (PreferencesHelper.getPreferences().getString(PreferencesHelper.PDF_VIEWER) + " \"" + o.getOrigen() + "\"");
-                            } else if(SystemHelper.isLinux()) {
+                            } else {
 //                                String fileOpen = "";
 //                                String[] fileName = null;
 //                                fileName = o.getOrigen().split(" ");

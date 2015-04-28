@@ -33,7 +33,6 @@ import flex.aponwao.gui.sections.main.windows.TablePDF;
 import flex.aponwao.gui.sections.main.windows.WindowMain;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
 import flex.aponwao.gui.sections.preferences.windows.PreferencesManager;
-import flex.eSign.helpers.exceptions.CertificateHelperException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -59,7 +58,7 @@ import org.eclipse.swt.widgets.Shell;
 public class Aponwao {
     private static final Logger logger = Logger.getLogger(Aponwao.class.getName());
     
-        public static void main(String[] args) throws InterruptedException, CertificateHelperException {
+        public static void main(String[] args) throws InterruptedException {
             Security.addProvider(new BouncyCastleProvider());
 		/*
 		 * Before this is run, be sure to set up the launch configuration (Arguments->VM Arguments) for the correct SWT
@@ -156,20 +155,128 @@ public class Aponwao {
             return mainShell;
         }
         
-        private static void porDefecto() throws CertificateHelperException {
+        private static void porDefecto() {
             WindowMain windowsMain = new WindowMain();
         }
         
-        private static void f(String ruta, String arch, boolean duplicar) throws CertificateHelperException {
+        private static void f(String ruta, String arch, boolean duplicar) {
             Shell shell = levantarShell();
             TablePDF tablePDF = new TablePDF (shell, SWT.NONE);
             tablePDF.addFilesFromFolder(false, ruta);
             FirmarPDFListener ejec = new FirmarPDFListener(tablePDF, duplicar);
             ejec.setResponse(arch);
             ejec.firmarPDF();
+            
+//            try {
+//                try {
+//                    if(PreferencesHelper.getPreferences().getString(PreferencesHelper.CERT_TYPE).equalsIgnoreCase(PreferencesHelper.CERT_HARDWARE_TYPE)) {
+//                        String pkcs11Path = PreferencesHelper.getHardwarePreferences().get(PreferencesHelper.getPreferences().getString(PreferencesHelper.HARDWARE_DISPOSITIVE));
+//                        String providerConfig = "name=" + PreferencesHelper.getPreferences().getString(PreferencesHelper.HARDWARE_DISPOSITIVE) + "\nlibrary=" + pkcs11Path + "\n";
+//                        ByteArrayInputStream localByteArrayInputStream = new ByteArrayInputStream(providerConfig.getBytes());
+//                        SunPKCS11 proveedor = null;
+//
+//                        proveedor = new SunPKCS11(localByteArrayInputStream);
+//                        Security.addProvider(proveedor);
+//                        try {
+//                            proveedor.login(new Subject(), new PasswordCallbackHandlerDialog(shell));
+//                        } catch (LoginException e) {
+//                            String m = LanguageResource.getLanguage().getString("error.login_tarjeta");
+//                            logger.log(Level.SEVERE, m, e);
+//                            LoggingDesktopController.printError(m);
+//                            return;
+//                        }
+//                        KeyStore ks = KeyStore.getInstance("PKCS11", proveedor);
+//                        try {
+//                            ks.load(localByteArrayInputStream, null);
+//                        } catch (Exception e) {
+//                            throw new KeyStoreException(e);
+//                        }
+//                        FirmarPDFHelper.setKs(ks);
+//                            
+//                    } else {
+//                        ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(shell);
+//                        progressMonitorDialog.run(true, true, new LoadKeyStoreProgress(shell));
+//                    }
+//                    
+//                } catch (InvocationTargetException e) {
+//
+//                        if (e.getCause().getClass().getName().equals("java.security.KeyStoreException")) {
+//                                FirmarPDFHelper.loadKeyStore(shell);
+//
+//                        } else if (e.getCause().getClass().getName().equals("org.eclipse.swt.SWTException")) {
+//                                FirmarPDFHelper.loadKeyStore(shell);
+//
+//                        } else if (e.getCause().getClass().getName().equals("sun.security.pkcs11.wrapper.PKCS11Exception")) {
+//                                throw (PKCS11Exception) e.getCause();
+//
+//                        } else if (e.getCause().getClass().getName().equals("java.security.NoSuchAlgorithmException")) {
+//                                throw (NoSuchAlgorithmException) e.getCause();
+//                        } else if (e.getCause().getClass().getName().equals("flex.aponwao.core.exceptions.CoreException")) {
+//                                throw (CoreException) e.getCause();
+//                        }
+//                }
+//            } catch (CorePKCS12Exception e) {
+//                    String m = LanguageResource.getLanguage().getString("error.pkcs12_pin_incorrecto");
+//                    logger.log(Level.SEVERE, m, e);
+//                    LoggingDesktopController.printError(m);
+//                    return;
+//            } catch (InterruptedException e) {
+//                    String m = LanguageResource.getLanguage().getString("error.operacion_cancelada");
+//                    logger.log(Level.SEVERE, m, e);
+//                    LoggingDesktopController.printError(m);
+//                    return;
+//            } catch (KeyStoreException e) {
+//                    String m = LanguageResource.getLanguage().getString("error.cargar_store");
+//                    logger.log(Level.SEVERE, m, e);
+//                    LoggingDesktopController.printError(m);
+//                    return;
+//            } catch (PKCS11Exception e) {
+//                    if (e.getMessage().equals(KeyStoreBuilderFactory.CKR_PIN_INCORRECT)) {
+//                            String m = LanguageResource.getLanguage().getString("error.pin_incorrecto");
+//                            logger.log(Level.SEVERE, m, e);
+//                            LoggingDesktopController.printError(m);
+//
+//                    } else if (e.getMessage().equals(KeyStoreBuilderFactory.CKR_PIN_LOCKED)) {
+//                            String m = LanguageResource.getLanguage().getString("error.tarjeta_bloqueada");
+//                            logger.log(Level.SEVERE, m, e);
+//                            LoggingDesktopController.printError(m);
+//
+//                    } else {
+//                            // Causas: -Meter la tarjeta al reves. -Password en blanco y pulsar aceptar.
+//                            String m = LanguageResource.getLanguage().getString("error.cargar_store");
+//                            logger.log(Level.SEVERE, m, e);
+//                            LoggingDesktopController.printError(m);
+//                    }
+//                    return;
+//            } catch (NoSuchAlgorithmException e) {
+//                    // Causas: -Tarjeta no introducida. 
+//                    String m = LanguageResource.getLanguage().getString("error.tarjeta_incorrecta");
+//                    logger.log(Level.SEVERE, m, e);
+//                    LoggingDesktopController.printError(m);
+//                    return;
+//
+//            } catch (CoreException e) {
+//                    String m = LanguageResource.getLanguage().getString("error.configuracion_incorrecta");
+//                    logger.log(Level.SEVERE, m, e);
+//                    LoggingDesktopController.printError(m);
+//                    return;
+//
+//            } catch (RuntimeException e) {
+//                    // Cuando se cancela el de tipo PKCS12 pasa por aqui.
+//                    return;
+//            }
+//            TablePDF tablePDF = new TablePDF (shell, SWT.NONE);
+//            tablePDF.addFilesFromFolder(false, ruta);
+//            FirmarPDFListener ejec = new FirmarPDFListener(tablePDF, duplicar);
+//            ejec.setKsloaded(true);
+//            ejec.setResponse(arch);
+//            ejec.firmarPDF();
+//
+//            // cierro la session con la tarjeta para que pida el pin otra vez después de una firma masiva o una firma simple
+//            if(PreferencesHelper.getPreferences().getString(PreferencesHelper.CERT_TYPE).equalsIgnoreCase(PreferencesHelper.CERT_HARDWARE_TYPE)) FirmarPDFHelper.logout();
         }
         
-        private static void v(String ruta, String arch) throws CertificateHelperException {
+        private static void v(String ruta, String arch) {
             Shell shell = levantarShell();
             TablePDF tablePDF = new TablePDF (shell, SWT.NONE);
             tablePDF.addFilesFromFolder(false, ruta);
@@ -178,7 +285,7 @@ public class Aponwao {
             ejec.validar();
         }
         
-        private static void s(String ruta, String arch) throws CertificateHelperException {
+        private static void s(String ruta, String arch) {
             Shell shell = levantarShell();
             TablePDF tablePDF = new TablePDF (shell, SWT.NONE);
             tablePDF.addFilesFromFolder(false, ruta);

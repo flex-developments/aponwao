@@ -2,6 +2,7 @@ package flex.aponwao.gui.sections.preferences.windows;
 
 import flex.aponwao.gui.application.LanguageResource;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
+
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;

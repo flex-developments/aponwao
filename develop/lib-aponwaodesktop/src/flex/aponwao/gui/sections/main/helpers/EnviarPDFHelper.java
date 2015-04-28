@@ -37,15 +37,12 @@ import flex.aponwao.core.keystore.KeyStoreBuilderFactory.KeyStoreTypes;
 import flex.aponwao.gui.application.LanguageResource;
 import flex.aponwao.gui.exceptions.SendPDFException;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateEncodingException;
 import org.bouncycastle.asn1.ASN1EncodableVector;
 import org.bouncycastle.asn1.cms.AttributeTable;
 import org.bouncycastle.asn1.smime.SMIMECapabilitiesAttribute;
 import org.bouncycastle.asn1.smime.SMIMECapability;
 import org.bouncycastle.asn1.smime.SMIMECapabilityVector;
 import org.bouncycastle.cert.jcajce.JcaCertStore;
-import org.bouncycastle.mail.smime.SMIMEException;
 import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 import org.bouncycastle.util.Store;
 import org.eclipse.swt.widgets.Shell;
@@ -205,25 +202,12 @@ public class EnviarPDFHelper {
                     
                     String hash = null;
                     String hashconf = PreferencesHelper.getPreferences().getString(PreferencesHelper.SIGN_HASH).toUpperCase();
-                    switch (hashconf) {
-                        case "SHA1":
-                            hash = SMIMESignedGenerator.DIGEST_SHA1;
-                            break;
-                        case "SHA256":
-                            hash = SMIMESignedGenerator.DIGEST_SHA256;
-                            break;
-                        case "SHA384":
-                            hash = SMIMESignedGenerator.DIGEST_SHA384;
-                            break;
-                        case "SHA512":
-                            hash = SMIMESignedGenerator.DIGEST_SHA512;
-                            break;
-                    }
-                    hashconf=null;
-                    System.gc();
-                    if(hash==null)
-                        throw new NoSuchAlgorithmException();
-                    
+                    if(hashconf.equals("SHA1")) hash = SMIMESignedGenerator.DIGEST_SHA1;
+                    else if(hashconf.equals("SHA256")) hash = SMIMESignedGenerator.DIGEST_SHA256;
+                    else if(hashconf.equals("SHA384")) hash = SMIMESignedGenerator.DIGEST_SHA384;
+                    else if(hashconf.equals("SHA512")) hash = SMIMESignedGenerator.DIGEST_SHA512;
+                    hashconf=null; System.gc();
+                    if(hash==null) throw new NoSuchAlgorithmException();
                     gen.addSigner(privada, signCert, hash, new AttributeTable(signedAttrs), null);
                     gen.addCertificates(certs);
                     //Se genera la firma
@@ -235,8 +219,9 @@ public class EnviarPDFHelper {
                     String msj = MessageFormat.format(LanguageResource.getLanguage().getString("error.sign.hash"), PreferencesHelper.getPreferences().getString(PreferencesHelper.SIGN_HASH).toUpperCase());
                     throw new SendPDFException(msj, e);
 
-                } catch (SMIMEException | KeyStoreException | CertificateEncodingException | UnrecoverableKeyException | IllegalArgumentException | MessagingException e) {
+                } catch (Exception e) {
                     throw new MessagingException(e.getLocalizedMessage(), e);
+                    
                 }
             } else {
                 contenidoDefitivo = multiParte;

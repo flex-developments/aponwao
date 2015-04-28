@@ -2,13 +2,15 @@
 Java - Core de aponwao. Funte original de http://www.sinadura.net/
 
 ## Dependencias
- * itextpdf-v552-nonofficial v010
-   * xmlsec-1.5.2-nonofficial
- * bc-jdk15to17-v150-nonofficial v010
- * lib-flex-pkikeys v010
- * lib-flex-helpers v010
+ * bcprov-jdk16-146
+ * bctsp-jdk16-146
+ * commons-net-3.1
+ * mail
+ * x86-3.3.0-v3346
+ * eSign v010
    * commons-net-3.1
-   * mail
+   * utils v010
+ * itext-5.1.2
 
 ## Copyright (C) 2008 - zylk.net
  * zylk.net (http://www.zylk.net/)

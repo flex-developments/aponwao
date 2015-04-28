@@ -23,13 +23,13 @@ import sun.security.x509.PKIXExtensions;
  * @since	1.4
  * @author	Yassir Elley
  */
-class KeyChecker extends PKIXCertPathChecker {
+final class KeyChecker extends PKIXCertPathChecker {
  
     private static final Debug debug = Debug.getInstance("certpath");
     // the index of keyCertSign in the boolean KeyUsage array
     private static final int keyCertSign = 5;
     private final int certPathLen;
-    private CertSelector targetConstraints;
+    private final CertSelector targetConstraints;
     private int remainingCerts;
 
     private static Set<String> supportedExts;
@@ -53,6 +53,7 @@ class KeyChecker extends PKIXCertPathChecker {
      * Initializes the internal state of the checker from parameters
      * specified in the constructor
      */
+    @Override
     public void init(boolean forward) throws CertPathValidatorException {
 	if (!forward) {
 	    remainingCerts = certPathLen;
@@ -61,13 +62,15 @@ class KeyChecker extends PKIXCertPathChecker {
 	}
     }
 
+    @Override
     public boolean isForwardCheckingSupported() {
 	return false;
     }
 
+    @Override
     public Set<String> getSupportedExtensions() {
 	if (supportedExts == null) {
-	    supportedExts = new HashSet<String>();
+	    supportedExts = new HashSet<>();
 	    supportedExts.add(PKIXExtensions.KeyUsage_Id.toString());
 	    supportedExts.add(PKIXExtensions.ExtendedKeyUsage_Id.toString());
 	    supportedExts.add(PKIXExtensions.SubjectAlternativeName_Id.toString());
@@ -85,6 +88,7 @@ class KeyChecker extends PKIXCertPathChecker {
      * @exception CertPathValidatorException Exception thrown if certificate
      * does not verify
      */
+    @Override
     public void check(Certificate cert, Collection<String> unresCritExts)
 	throws CertPathValidatorException
     {

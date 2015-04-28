@@ -13,7 +13,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 public class FileCallbackHandler implements CallbackHandler, PasswordExtractor {
     public static final String PASSWORD_CERTIFICATE = "certificate.password";
     private PasswordProtection passwordProtection = null;
-    private String preferencesPath;
+    private final String preferencesPath;
 	
 	
     public FileCallbackHandler(String preferencesPath) {

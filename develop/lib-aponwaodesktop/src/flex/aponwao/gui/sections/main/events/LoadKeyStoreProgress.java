@@ -22,17 +22,20 @@
 
 package flex.aponwao.gui.sections.main.events;
 
-import flex.aponwao.core.exceptions.CoreException;
-import flex.aponwao.core.exceptions.CorePKCS12Exception;
-import flex.aponwao.gui.application.LanguageResource;
-import flex.aponwao.gui.sections.main.helpers.FirmarPDFHelper;
 import java.lang.reflect.InvocationTargetException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Logger;
+
+import flex.aponwao.core.exceptions.CoreException;
+import flex.aponwao.core.exceptions.CorePKCS12Exception;
+import flex.aponwao.gui.application.LanguageResource;
+import flex.aponwao.gui.sections.main.helpers.FirmarPDFHelper;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
+
 import sun.security.pkcs11.wrapper.PKCS11Exception;
 
 

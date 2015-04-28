@@ -3,7 +3,7 @@ package flex.aponwao.core.validate;
 
 import flex.aponwao.core.exceptions.ChainValidationException;
 import flex.aponwao.core.validator.AponwaoCertPathValidator;
-import flex.eSign.operators.CertificateVerifierOperator;
+import flex.eSign.operators.VerificadorCertificadoOperator;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -54,6 +53,8 @@ import java.util.logging.Logger;
 import javax.security.auth.x500.X500Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.ocsp.BasicOCSPResp;
+import org.bouncycastle.ocsp.OCSPException;
+import org.bouncycastle.tsp.TSPException;
 import org.bouncycastle.tsp.TimeStampToken;
 import sun.security.validator.Validator;
 
@@ -97,7 +98,7 @@ public class CertificatePathBuilder {
                                             cert.verify(certTrusted.getPublicKey());
                                             return (certTrusted);
 
-                                    } catch (Exception e) {
+                                    } catch (CertificateException | NoSuchAlgorithmException | InvalidKeyException | NoSuchProviderException | SignatureException e) {
                                             logger.log(Level.INFO, "Controled exception", e);
                                     }
                             }
@@ -120,12 +121,9 @@ public class CertificatePathBuilder {
      * @return a complete certificate chain.
      */
     public static X509Certificate[] completeChain(X509Certificate[] originalChain, KeyStore ks) {
-            List<X509Certificate> newChainList = new ArrayList<X509Certificate>();
+            List<X509Certificate> newChainList = new ArrayList<>();
 
-            for (int i=0; i<originalChain.length; i++) {
-
-                    newChainList.add(originalChain[i]);
-            }
+            newChainList.addAll(Arrays.asList(originalChain));
 
             X509Certificate lastCert = ((X509Certificate) originalChain[originalChain.length - 1]);
 
@@ -148,13 +146,7 @@ public class CertificatePathBuilder {
 
                                             } catch (SignatureException e) {
 //							logger.log(Level.INFO, "controled exception", e);
-                                            } catch (InvalidKeyException e) {
-                                                    logger.log(Level.SEVERE, "", e);
-                                            } catch (CertificateException e) {
-                                                    logger.log(Level.SEVERE, "", e);
-                                            } catch (NoSuchAlgorithmException e) {
-                                                    logger.log(Level.SEVERE, "", e);
-                                            } catch (NoSuchProviderException e) {
+                                            } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException | NoSuchProviderException e) {
                                                     logger.log(Level.SEVERE, "", e);
                                             } 
 
@@ -200,7 +192,7 @@ public class CertificatePathBuilder {
                     ts.validate(certStoreX509, provider);
                     return certStoreX509;
                 }
-                catch (Exception ex) {
+                catch (KeyStoreException | TSPException | CertificateExpiredException | CertificateNotYetValidException | NoSuchProviderException ex) {
                 }
             }
         }
@@ -233,7 +225,7 @@ public class CertificatePathBuilder {
                     if (ocsp.verify(certStoreX509.getPublicKey(), provider))
                         return certStoreX509;
                 }
-                catch (Exception ex) {
+                catch (KeyStoreException | OCSPException | NoSuchProviderException ex) {
                 }
             }
         }
@@ -251,11 +243,9 @@ public class CertificatePathBuilder {
      * @param cert the certificate to verify
      * @param crls the certificate revocation list or <CODE>null</CODE>
      * @param calendar the date or <CODE>null</CODE> for the current date
-     * @return a <CODE>String</CODE> with the error description or <CODE>null</CODE>
-     * if no error
 	 * @throws CertificateNotYetValidException 
 	 * @throws CertificateExpiredException 
-	 * @throws RevokedException 
+	 * @throws CertificateRevokedException 
      */    
     public static void verifyCertificate(X509Certificate cert, Collection crls, Calendar calendar) throws CertificateExpiredException, CertificateNotYetValidException, CertificateRevokedException {
     	
@@ -274,7 +264,7 @@ public class CertificatePathBuilder {
         	
             for (Iterator it = crls.iterator(); it.hasNext();) {
                 X509CRL crl = (X509CRL)it.next();
-                CertificateVerifierOperator.verifyCertificateWithCRL(cert, crl, new Date());
+                VerificadorCertificadoOperator.verificarCertificadoCRL(cert, crl);
             }
         }
 
@@ -283,7 +273,7 @@ public class CertificatePathBuilder {
     /**
      * Verifies a certificate chain against a KeyStore. If the function finish the chain is valid.
      *  
-     * @param chain
+     * @param chain certificate chain
      * @param kstrusted the <CODE>KeyStore</CODE>
      * @param crls the certificate revocation list or <CODE>null</CODE>
      * @param calendar the date or <CODE>null</CODE> for the current date
@@ -300,13 +290,7 @@ public class CertificatePathBuilder {
 			ksTemp = KeyStore.getInstance(KeyStore.getDefaultType());
 			ksTemp.load(null, null);
 			
-		} catch (KeyStoreException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (CertificateException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (IOException e) {
+		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
 			logger.log(Level.SEVERE, "", e);
 		}
 		
@@ -367,12 +351,8 @@ public class CertificatePathBuilder {
                         
                         try {
                         	verifyCertificate(certStoreX509, crls, calendar);
-                        } catch (CertificateExpiredException e) {
+                        } catch (CertificateExpiredException | CertificateNotYetValidException | CertificateRevokedException e) {
                         	logger.log(Level.INFO, "Controled exception", e);
-                        } catch (CertificateNotYetValidException e) {
-                                logger.log(Level.INFO, "Controled exception", e);
-                        } catch (CertificateRevokedException e) {
-                                logger.log(Level.INFO, "Controled exception", e);
                         }
                             
                         try {
@@ -380,8 +360,7 @@ public class CertificatePathBuilder {
                             // OK
                             return;
                         }
-                        catch (Exception e) {
-                            continue;
+                        catch (CertificateException | NoSuchAlgorithmException | InvalidKeyException | NoSuchProviderException | SignatureException e) {
                         }
                     }
                     catch (Exception ex) {
@@ -399,7 +378,7 @@ public class CertificatePathBuilder {
                     certChain.verify(certNext.getPublicKey());
                     break;
                 }
-                catch (Exception e) {
+                catch (CertificateException | NoSuchAlgorithmException | InvalidKeyException | NoSuchProviderException | SignatureException e) {
                 }
             }
             if (j == chain.length) {
@@ -417,12 +396,11 @@ public class CertificatePathBuilder {
     /**
      * Verifies a certificate chain against a KeyStore. If the function finish the chain is valid.
      *  
-     * @param chain the certificate chain
+     * @param certPath the certificate chain
      * @param ksTrust the <CODE>KeyStore</CODE>
-     * @param crls the certificate revocation list or <CODE>null</CODE>
      * @param calendar the date or <CODE>null</CODE> for the current date
      * 
-	 * @throws ChainValidationException 
+	 * @throws CertPathValidatorException 
 	 *  
      */    
     public static void verifyCertificateChainRealTime(CertPath certPath, KeyStore ksTrust, Calendar calendar) throws CertPathValidatorException {
@@ -439,7 +417,7 @@ public class CertificatePathBuilder {
     	
     	List<Certificate> certList = (List<Certificate>) certPath.getCertificates();
     	
-    	List<Certificate> newList = new ArrayList<Certificate>();
+    	List<Certificate> newList = new ArrayList<>();
     	 
     	for (Certificate cert : certList) {
 			
@@ -474,9 +452,7 @@ public class CertificatePathBuilder {
 		try {
 			params = new PKIXParameters(ksTrust);
 
-		} catch (KeyStoreException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (InvalidAlgorithmParameterException e) {
+		} catch (KeyStoreException | InvalidAlgorithmParameterException e) {
 			logger.log(Level.SEVERE, "", e);
 		}
 
@@ -497,7 +473,7 @@ public class CertificatePathBuilder {
 		
 		
 		
-		logger.info("chain validation date: " + calendar.getTime().toGMTString());
+		logger.log(Level.INFO, "chain validation date: {0}", calendar.getTime().toGMTString());
 		params.setDate(calendar.getTime());
 		
 //		critical policy qualifiers present in certificate
@@ -574,7 +550,7 @@ public class CertificatePathBuilder {
     
     public static CertStore convert2CertStore(KeyStore ks) {
 
-    	List<Certificate> mylist = new ArrayList<Certificate>();
+    	List<Certificate> mylist = new ArrayList<>();
     	
 		try {
 			Enumeration<String> aliases = ks.aliases();
@@ -595,9 +571,7 @@ public class CertificatePathBuilder {
 		try {
 			cs = CertStore.getInstance("Collection", cparam);
 			
-		} catch (InvalidAlgorithmParameterException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (NoSuchAlgorithmException e) {
+		} catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
 			logger.log(Level.SEVERE, "", e);
 		}
 		    
@@ -608,12 +582,9 @@ public class CertificatePathBuilder {
     public static CertStore convert2CertStore(Certificate[] array) {
 
     	
-    	List<Certificate> mylist = new ArrayList<Certificate>();
+    	List<Certificate> mylist = new ArrayList<>();
     	
-    	for (Certificate cert : array) {
-			
-	    	mylist.add(cert);
-		}
+        mylist.addAll(Arrays.asList(array));
 		
     	
     	CertStoreParameters cparam = new CollectionCertStoreParameters(mylist);
@@ -622,9 +593,7 @@ public class CertificatePathBuilder {
 		try {
 			cs = CertStore.getInstance("Collection", cparam);
 			
-		} catch (InvalidAlgorithmParameterException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (NoSuchAlgorithmException e) {
+		} catch (InvalidAlgorithmParameterException | NoSuchAlgorithmException e) {
 			logger.log(Level.SEVERE, "", e);
 		}
 		    
@@ -649,7 +618,7 @@ public class CertificatePathBuilder {
     	
     		CertificateFactory certFact = CertificateFactory.getInstance("X.509");
     		
-	    	List<X509Certificate> certPathList = new ArrayList<X509Certificate>();
+	    	List<X509Certificate> certPathList = new ArrayList<>();
 	    	
 	    	X509Certificate currentCert = cert;
 
@@ -721,11 +690,7 @@ public class CertificatePathBuilder {
 			
 	    	throw new CertPathBuilderException();
 			
-		} catch (KeyStoreException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (CertStoreException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (CertificateException e) {
+		} catch (KeyStoreException | CertStoreException | CertificateException e) {
 			logger.log(Level.SEVERE, "", e);
 		}
 
@@ -755,9 +720,7 @@ public class CertificatePathBuilder {
 //	    		parameters = new PKIXBuilderParameters( Collections.singleton(new TrustAnchor((X509Certificate)cert, null)), s);
 				parameters = new PKIXBuilderParameters(ksTrust, s);
 				
-			} catch (KeyStoreException e) {
-				logger.log(Level.SEVERE, "", e);
-			} catch (InvalidAlgorithmParameterException e) {
+			} catch (KeyStoreException | InvalidAlgorithmParameterException e) {
 				logger.log(Level.SEVERE, "", e);
 			}
 			
@@ -817,15 +780,6 @@ public class CertificatePathBuilder {
 		}
 		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	
 

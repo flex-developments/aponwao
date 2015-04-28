@@ -15,29 +15,29 @@ import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfString;
 import com.itextpdf.text.pdf.TSAClient;
 import com.itextpdf.text.pdf.TSAClientBouncyCastle;
-import flex.aponwao.core.exceptions.SignPDFException;
-import flex.aponwao.core.keystore.KeyStoreBuilderFactory;
-import flex.aponwao.core.keystore.KeyStoreBuilderFactory.KeyStoreTypes;
-import flex.aponwao.core.password.PasswordExtractor;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.security.KeyStore;
 import java.security.KeyStore.PasswordProtection;
+import java.util.Properties;
+import javax.security.auth.callback.CallbackHandler;
+import sun.security.pkcs11.SunPKCS11;
+import java.io.File;
+import java.io.InputStream;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.PrivateKey;
-import java.security.Security;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Properties;
-import javax.security.auth.callback.CallbackHandler;
+import flex.aponwao.core.keystore.KeyStoreBuilderFactory;
+import flex.aponwao.core.keystore.KeyStoreBuilderFactory.KeyStoreTypes;
+import flex.aponwao.core.password.PasswordExtractor;
+import flex.aponwao.core.exceptions.SignPDFException;
+import java.security.Security;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import sun.security.pkcs11.SunPKCS11;
 
 public class Aponwao extends Thread {
 
@@ -99,6 +99,7 @@ public class Aponwao extends Thread {
       private static int eC = 1;
 	/**
 	 * @param args
+     * @throws java.lang.Exception
 	 */
 	public static void main(String[] args) throws Exception {
             Security.addProvider(new BouncyCastleProvider());

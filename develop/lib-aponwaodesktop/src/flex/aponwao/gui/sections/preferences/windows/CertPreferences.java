@@ -1,9 +1,11 @@
 package flex.aponwao.gui.sections.preferences.windows;
 
 
+import java.util.logging.Logger;
+
 import flex.aponwao.gui.application.LanguageResource;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
-import java.util.logging.Logger;
+
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
 

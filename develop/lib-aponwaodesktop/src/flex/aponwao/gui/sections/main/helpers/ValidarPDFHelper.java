@@ -10,7 +10,6 @@ import flex.aponwao.gui.application.TimestampInfo;
 import flex.aponwao.gui.exceptions.DocumentValidationException;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
 import flex.eSign.helpers.CertificateHelper;
-import flex.eSign.helpers.exceptions.CertificateHelperException;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -40,8 +39,8 @@ public class ValidarPDFHelper {
 
 	private static final Logger logger = Logger.getLogger(ValidarPDFHelper.class.getName());
         //OJO... Modificacion felix
-        private static ArrayList<String> listaSignatarios = new ArrayList<>();
-        private static ArrayList<String> listaFechasFirmas = new ArrayList<>();
+        private static ArrayList<String> listaSignatarios = new ArrayList<String>();
+        private static ArrayList<String> listaFechasFirmas = new ArrayList<String>();
 
         public static ArrayList<String> getSignatarios() {
             return listaSignatarios;
@@ -52,8 +51,8 @@ public class ValidarPDFHelper {
         }
         //**********************************************************************
 	
-	public static List<PDFSignatureInfo> validatePDF (PDFInfo pdfParameter) throws DocumentValidationException, CertificateHelperException {
-            List<PDFSignatureInfo> firmasEncontradas = new ArrayList<>();
+	public static List<PDFSignatureInfo> validatePDF (PDFInfo pdfParameter) throws DocumentValidationException {
+            List<PDFSignatureInfo> firmasEncontradas = new ArrayList<PDFSignatureInfo>();
             KeyStore kall = PdfPKCS7.loadCacertsKeyStore();
             PdfReader reader = null;
             try {
@@ -77,11 +76,8 @@ public class ValidarPDFHelper {
                 pdfSignature.setDate(date.getTime());
                 
                 //OJO... Modificacion Felix ------------------------------------
-                String cn = CertificateHelper.getCN(p7.getSigningCertificate());
-                listaSignatarios.add(cn);
-                
-                java.sql.Timestamp time = new java.sql.Timestamp(pdfSignature.getDate().getTime());
-                listaFechasFirmas.add(time.toString());
+                listaSignatarios.add(CertificateHelper.getCN(p7.getSigningCertificate()));
+                listaFechasFirmas.add(new java.sql.Timestamp(pdfSignature.getDate().getTime()).toString());
                 try {
                     //Si no se verifica la firma
                     if (!p7.verify())  pdfSignature.setStatusFirma(PDFSignatureInfo.STATUS_CORRUPTED);
@@ -112,7 +108,7 @@ public class ValidarPDFHelper {
                 Certificate pkc[] = p7.getSignCertificateChain();
                 
                 // BUILD AND VALIDATE THE CHAIN
-                List<CertStore> certStoreList = new ArrayList<>();
+                List<CertStore> certStoreList = new ArrayList<CertStore>();
                 certStoreList.add(CertificatePathBuilder.convert2CertStore(pkc));
                 certStoreList.add(CertificatePathBuilder.convert2CertStore(PreferencesHelper.getCacheKeystorePreferences()));
                 
@@ -140,7 +136,7 @@ public class ValidarPDFHelper {
                         pdfSignature.setChainValidationException(e);
                         
                 } finally {
-                        List<X509Certificate> path = new ArrayList<>();
+                        List<X509Certificate> path = new ArrayList<X509Certificate>();
                         for (Certificate c : pkc) {
                                 path.add((X509Certificate)c);
                         }
@@ -311,7 +307,7 @@ public class ValidarPDFHelper {
 				chainTimestamp = (X509Certificate[]) CertificatePathBuilder.completeChain(chainTimestamp, ksTimestamp);
 				chainTimestamp = (X509Certificate[]) CertificatePathBuilder.completeChain(chainTimestamp, PreferencesHelper.getCacheKeystorePreferences());
 				
-				timestampInfo.setChain( (List<X509Certificate>)new ArrayList<>(Arrays.asList(chainTimestamp)) );
+				timestampInfo.setChain( (List<X509Certificate>)new ArrayList<X509Certificate>(Arrays.asList(chainTimestamp)) );
 				
 			}
 			

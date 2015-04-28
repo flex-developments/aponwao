@@ -148,7 +148,7 @@ class DistributionPointFetcher {
 		return Collections.emptySet();
 	    }
 	    List points = (List)ext.get(CRLDistributionPointsExtension.POINTS);
-	    Set<X509CRL> results = new HashSet<X509CRL>();
+	    Set<X509CRL> results = new HashSet<>();
 	    for (Iterator t = points.iterator(); 
 		 t.hasNext() && !Arrays.equals(reasonsMask, ALL_REASONS); ) {
 		DistributionPoint point = (DistributionPoint)t.next();
@@ -161,9 +161,7 @@ class DistributionPointFetcher {
 		debug.println("Returning " + results.size() + " CRLs");
 	    }
 	    return results;
-	} catch (CertificateException e) {
-	    return Collections.emptySet();
-	} catch (IOException e) {
+	} catch (CertificateException | IOException e) {
 	    return Collections.emptySet();
 	}
     }
@@ -182,8 +180,8 @@ class DistributionPointFetcher {
         if (fullName == null) { 
             return Collections.emptySet();
         } 
-	Collection<X509CRL> possibleCRLs = new ArrayList<X509CRL>();
-	Collection<X509CRL> crls = new ArrayList<X509CRL>(2);
+	Collection<X509CRL> possibleCRLs = new ArrayList<>();
+	Collection<X509CRL> crls = new ArrayList<>(2);
 	for (Iterator t = fullName.iterator(); t.hasNext(); ) {
 	    GeneralName name = (GeneralName)t.next();
 	    if (name.getType() == GeneralNameInterface.NAME_DIRECTORY) {
@@ -209,7 +207,7 @@ class DistributionPointFetcher {
 				  reasonsMask, prevKey, provider)) {
 		    crls.add(crl);
 	        }
-	    } catch (Exception e) {
+	    } catch (IOException | CRLException e) {
 		// don't add the CRL
 	        if (debug != null) {
 		    debug.println("Exception verifying CRL: " + e.getMessage());
@@ -250,7 +248,7 @@ class DistributionPointFetcher {
 		} else {
 		    return (X509CRL) crls.iterator().next();
 		}
-            } catch (Exception e) {
+            } catch (IOException | NoSuchAlgorithmException | InvalidAlgorithmParameterException | CertStoreException e) {
                 if (debug != null) {
                     debug.println("Exception getting CRL from CertStore: " + e);
                     e.printStackTrace();
@@ -280,7 +278,7 @@ class DistributionPointFetcher {
 	X509CRLSelector xcs = new X509CRLSelector();
 	xcs.addIssuer(name.asX500Principal());
 	xcs.addIssuer(certIssuer);
-	Collection<X509CRL> crls = new ArrayList<X509CRL>();
+	Collection<X509CRL> crls = new ArrayList<>();
 	for (CertStore store : certStores) {
 	    try {
 		crls.addAll((Collection<X509CRL>) store.getCRLs(xcs));
@@ -519,7 +517,7 @@ class DistributionPointFetcher {
 	// validate the signature on the CRL
         try {
             crl.verify(prevKey, provider);
-        } catch (Exception e) {
+        } catch (CRLException | NoSuchAlgorithmException | InvalidKeyException | NoSuchProviderException | SignatureException e) {
             if (debug != null) {
                 debug.println("CRL signature failed to verify");
             }
@@ -559,7 +557,7 @@ class DistributionPointFetcher {
      */
     private GeneralNames getFullNames(X500Name issuer, RDN rdn) 
 	throws IOException {
-        List<RDN> rdns = new ArrayList<RDN>(issuer.rdns());
+        List<RDN> rdns = new ArrayList<>(issuer.rdns());
         rdns.add(rdn);
         X500Name fullName = new X500Name(((RDN[])rdns.toArray(new RDN[0])));
         GeneralNames fullNames = new GeneralNames();
@@ -632,12 +630,7 @@ class DistributionPointFetcher {
 		}
 		crl = (X509CRL)factory.generateCRL(in);
 		return crl;
-	    } catch (IOException e) {
-		if (debug != null) {
-		    debug.println("Exception fetching CRLDP:");
-		    e.printStackTrace();
-		}
-	    } catch (CRLException e) {
+	    } catch (IOException | CRLException e) {
 		if (debug != null) {
 		    debug.println("Exception fetching CRLDP:");
 		    e.printStackTrace();

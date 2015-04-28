@@ -61,15 +61,9 @@ public class FirmarPDFProgress implements IRunnableWithProgress {
                         List<File> fileList = FileDialogs.getFilesFromDir(new File (pdfParaFirmar.getOrigen().substring(0, 
                                 pdfParaFirmar.getOrigen().lastIndexOf("/"))), FileDialogs.PDF_TYPE);
                         
-                        String aux1 = null;
-                        
-                        if (PreferencesHelper.getPreferences().getString(PreferencesHelper.APLICATION_PATH_SOURCE).equals(PreferencesHelper.APLICATION_PATH_SOURCE_FOLDER) ) {
-                            aux1 = pdfParaFirmar.getOrigen().substring(0, pdfParaFirmar.getOrigen().lastIndexOf("/"));
-                            aux1 = PreferencesHelper.getPreferences().getString(PreferencesHelper.APLICATION_PATH_FINAL_FOLDER_VALUE) + 
-                                    aux1.substring(aux1.lastIndexOf("/"), aux1.length()) + "-Firmados";
-                        } else {
-                            aux1 = pdfParaFirmar.getDestino();
-                        }
+                        String aux1 = pdfParaFirmar.getOrigen().substring(0, pdfParaFirmar.getOrigen().lastIndexOf("/"));
+                        aux1 = PreferencesHelper.getPreferences().getString(PreferencesHelper.APLICATION_PATH_FINAL_FOLDER_VALUE) + 
+                                aux1.substring(aux1.lastIndexOf("/"), aux1.length()) + "-Firmados";
                         
                         boolean success = false;
                         try {
@@ -84,9 +78,8 @@ public class FirmarPDFProgress implements IRunnableWithProgress {
                         for (File file : fileList) {
                                 PDFInfo pdfReaderSign = new PDFInfo();
                                 pdfReaderSign.setOrigen(file.getAbsolutePath());
-                                if (success) {
+                                if (success)
                                     pdfReaderSign.setDestino(aux1);
-                                }
                                 aux.add(pdfReaderSign);
                         }     
                 } else
@@ -114,7 +107,6 @@ public class FirmarPDFProgress implements IRunnableWithProgress {
                 }
                 
                 pdfParaFirmar.setSigned(true);
-                FirmarPDFHelper.archivo_canaimita = null;
         }
         monitor.done();
     }

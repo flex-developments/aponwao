@@ -1,13 +1,15 @@
 package flex.aponwao.gui.sections.main.events;
 
 
-import flex.aponwao.gui.application.LanguageResource;
-import flex.aponwao.gui.application.LoggingDesktopController;
-import flex.aponwao.gui.sections.main.windows.TablePDF;
-import flex.eSign.helpers.exceptions.CertificateHelperException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+
+import flex.aponwao.gui.application.LanguageResource;
+import flex.aponwao.gui.application.LoggingDesktopController;
+import flex.aponwao.gui.sections.main.windows.TablePDF;
+
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -23,7 +25,7 @@ public class ValidarPDFListener implements SelectionListener {
         }
         //**********************************************************************
         
-	private static final Logger	logger	= Logger.getLogger(ValidarPDFListener.class.getName());
+	private static Logger	logger	= Logger.getLogger(ValidarPDFListener.class.getName());
 	
 	private TablePDF tablePDF = null;
 	
@@ -32,22 +34,16 @@ public class ValidarPDFListener implements SelectionListener {
 		this.tablePDF = t;
 	}
 	
-        @Override
 	public void widgetSelected(SelectionEvent event) {
-            try {
-                validar();
-            } catch (CertificateHelperException ex) {
-                Logger.getLogger(ValidarPDFListener.class.getName()).log(Level.SEVERE, null, ex);
-            }
+		validar();
 	}
 
-        @Override
 	public void widgetDefaultSelected(SelectionEvent event) {
 		widgetSelected(event);
 	}
         
-        public void validar() throws CertificateHelperException {
-            if (!tablePDF.getSelectedPDFs().isEmpty()) {
+        public void validar() {
+            if (tablePDF.getSelectedPDFs().size() != 0) {
 
 			try {
 				ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(tablePDF.getShell());

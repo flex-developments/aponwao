@@ -10,7 +10,6 @@ import flex.aponwao.gui.sections.main.events.FirmarPDFListener;
 import flex.aponwao.gui.sections.main.events.ValidarPDFListener;
 import flex.aponwao.gui.sections.main.events.VisualizarPDFListener;
 import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
-import flex.eSign.helpers.exceptions.CertificateHelperException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.logging.Level;
@@ -46,13 +45,13 @@ public class PanelPDF extends Composite {
 	private TablePDF 			tablePDF  = null;
 	
 	
-	public PanelPDF(Composite parent, int style) throws CertificateHelperException {
+	public PanelPDF(Composite parent, int style) {
 		
 		super(parent, style);
 		initialize();
 	}
 
-	private void initialize() throws CertificateHelperException {
+	private void initialize() {
 		
 		
 		GridData gdPanel = new GridData();
@@ -276,17 +275,11 @@ public class PanelPDF extends Composite {
 	
 	class ButtonAddPDFListener implements SelectionListener {
 		
-                @Override
 		public void widgetSelected(SelectionEvent event) {
 			
-                    try {
-                        tablePDF.addFiles(false);
-                    } catch (CertificateHelperException ex) {
-                        Logger.getLogger(PanelPDF.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+			tablePDF.addFiles(false);
 		}
 
-                @Override
 		public void widgetDefaultSelected(SelectionEvent event) {
 			widgetSelected(event);
 		}
@@ -294,17 +287,11 @@ public class PanelPDF extends Composite {
 	
 	class ButtonAddDirListener implements SelectionListener {
 		
-                @Override
 		public void widgetSelected(SelectionEvent event) {
 			
-                    try {
-                        tablePDF.addFiles(true);
-                    } catch (CertificateHelperException ex) {
-                        Logger.getLogger(PanelPDF.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+			tablePDF.addFiles(true);
 		}
 
-                @Override
 		public void widgetDefaultSelected(SelectionEvent event) {
 			widgetSelected(event);
 		}
@@ -313,13 +300,11 @@ public class PanelPDF extends Composite {
 	
 	class ButtonRemoveListener implements SelectionListener {
 		
-                @Override
 		public void widgetSelected(SelectionEvent event) {
 
 			tablePDF.removeFile();
 		}
 
-                @Override
 		public void widgetDefaultSelected(SelectionEvent event) {
 			widgetSelected(event);
 		}

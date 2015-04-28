@@ -21,12 +21,13 @@
 */
 package flex.aponwao.gui.sections.preferences.windows;
 
-import flex.aponwao.gui.application.LanguageResource;
-import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.eclipse.jface.preference.IPreferenceStore;
+
+import flex.aponwao.gui.application.LanguageResource;
+import flex.aponwao.gui.sections.preferences.helpers.PreferencesHelper;
+
 import org.eclipse.jface.preference.PreferenceDialog;
 import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.jface.preference.PreferenceNode;
@@ -36,7 +37,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class PreferencesManager {
 	
-	private static final Logger logger = Logger.getLogger(PreferencesManager.class.getName());
+	private static Logger logger = Logger.getLogger(PreferencesManager.class.getName());
 
 	/**
 	 * @param mainShell
@@ -145,7 +146,7 @@ public class PreferencesManager {
 		} catch (IOException e) {
 			logger.log(Level.SEVERE, "", e);
 		}
-		dlg.setPreferenceStore((IPreferenceStore) ps);
+		dlg.setPreferenceStore(ps);
 
 		// Open the dialog
 		dlg.open();
