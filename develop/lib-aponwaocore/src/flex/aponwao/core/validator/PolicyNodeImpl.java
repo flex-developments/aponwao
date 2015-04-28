@@ -115,30 +115,37 @@ final class PolicyNodeImpl implements PolicyNode {
              node.mCriticalityIndicator, node.mExpectedPolicySet, false);
     }
 
+    @Override
     public PolicyNode getParent() {
         return mParent;
     }
 
+    @Override
     public Iterator<PolicyNodeImpl> getChildren() {
         return Collections.unmodifiableSet(mChildren).iterator();
     }
 
+    @Override
     public int getDepth() {
         return mDepth;
     }
 
+    @Override
     public String getValidPolicy() {
         return mValidPolicy;
     }
 
+    @Override
     public Set<PolicyQualifierInfo> getPolicyQualifiers() {
         return Collections.unmodifiableSet(mQualifierSet);
     }
 
+    @Override
     public Set<String> getExpectedPolicies() {
         return Collections.unmodifiableSet(mExpectedPolicySet);
     }
 
+    @Override
     public boolean isCritical() {
         return mCriticalityIndicator;
     }
@@ -150,8 +157,9 @@ final class PolicyNodeImpl implements PolicyNode {
      *
      * @return a String describing the contents of the Policy Node
      */
+    @Override
     public String toString() {
-        StringBuffer buffer = new StringBuffer(this.asString());
+        StringBuilder buffer = new StringBuilder(this.asString());
         
         Iterator it = getChildren();
         while (it.hasNext()) {
@@ -223,7 +231,7 @@ final class PolicyNodeImpl implements PolicyNode {
 	    throw new IllegalStateException("PolicyNode is immutable");
  
         // if we have no children, we can't prune below us...
-        if (mChildren.size() == 0)
+        if (mChildren.isEmpty())
             return;
 
         Iterator it = mChildren.iterator();
@@ -232,7 +240,7 @@ final class PolicyNodeImpl implements PolicyNode {
             node.prune(depth);
             // now that we've called prune on the child, see if we should
             // remove it from the tree
-            if ((node.mChildren.size() == 0) && (depth > mDepth + 1))
+            if ((node.mChildren.isEmpty()) && (depth > mDepth + 1))
                 it.remove();
         }
     }
@@ -386,7 +394,7 @@ final class PolicyNodeImpl implements PolicyNode {
         if (mParent == null) {
             return "anyPolicy  ROOT\n";
         } else {
-	    StringBuffer sb = new StringBuffer();
+	    StringBuilder sb = new StringBuilder();
 	    for (int i = 0, n = getDepth(); i < n; i++) {
 		sb.append("  ");
 	    }

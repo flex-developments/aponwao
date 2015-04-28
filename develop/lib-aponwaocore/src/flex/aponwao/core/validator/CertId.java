@@ -45,6 +45,9 @@ public class CertId {
 
     /**
      * Creates a CertId. The hash algorithm used is SHA-1. 
+     * @param issuerCert
+     * @param serialNumber
+     * @throws java.lang.Exception
      */
     public CertId(X509CertImpl issuerCert, SerialNumber serialNumber) 
 	throws Exception {
@@ -78,6 +81,8 @@ public class CertId {
 
     /**
      * Creates a CertId from its ASN.1 DER encoding.
+     * @param derIn
+     * @throws java.io.IOException
      */
     public CertId(DerInputStream derIn) throws IOException {
 
@@ -89,6 +94,7 @@ public class CertId {
 	
     /**
      * Return the hash algorithm identifier.
+     * @return 
      */
     public AlgorithmId getHashAlgorithm() {
 	return hashAlgId;
@@ -96,6 +102,7 @@ public class CertId {
 
     /**
      * Return the hash value for the issuer name.
+     * @return 
      */
     public byte[] getIssuerNameHash() {
 	return issuerNameHash;
@@ -103,6 +110,7 @@ public class CertId {
 
     /**
      * Return the hash value for the issuer key.
+     * @return 
      */
     public byte[] getIssuerKeyHash() {
 	return issuerKeyHash;
@@ -110,6 +118,7 @@ public class CertId {
 
     /**
      * Return the serial number.
+     * @return 
      */
     public BigInteger getSerialNumber() {
 	return certSerialNumber.getNumber();
@@ -118,6 +127,8 @@ public class CertId {
     /**
      * Encode the CertId using ASN.1 DER.
      * The hash algorithm used is SHA-1.
+     * @param out
+     * @throws java.io.IOException
      */
     public void encode(DerOutputStream out) throws IOException {
 
@@ -140,6 +151,7 @@ public class CertId {
      *
      * @return the hashcode value.
      */
+    @Override
     public int hashCode() {
         if (myhash == -1) {
             myhash = hashAlgId.hashCode();
@@ -163,6 +175,7 @@ public class CertId {
      * @param other the object to test for equality with this object.
      * @return true if the objects are considered equal, false otherwise.
      */
+    @Override
     public boolean equals(Object other) {
 
         if (this == other) {
@@ -173,19 +186,17 @@ public class CertId {
 	}
 
 	CertId that = (CertId) other;
-	if (hashAlgId.equals(that.getHashAlgorithm()) &&
-	    Arrays.equals(issuerNameHash, that.getIssuerNameHash()) &&
-	    Arrays.equals(issuerKeyHash, that.getIssuerKeyHash()) &&
-	    certSerialNumber.getNumber().equals(that.getSerialNumber())) {
-	    return true;
-	} else {
-	    return false;
-	}
+        return hashAlgId.equals(that.getHashAlgorithm()) &&
+                Arrays.equals(issuerNameHash, that.getIssuerNameHash()) &&
+                Arrays.equals(issuerKeyHash, that.getIssuerKeyHash()) &&
+                certSerialNumber.getNumber().equals(that.getSerialNumber());
     }
 
     /**
      * Create a string representation of the CertId.
+     * @return 
      */
+    @Override
     public String toString() {
 	StringBuilder sb = new StringBuilder();
 	sb.append("CertId \n");

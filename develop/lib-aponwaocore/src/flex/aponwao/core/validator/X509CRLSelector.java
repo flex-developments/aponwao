@@ -109,7 +109,7 @@ public class X509CRLSelector implements CRLSelector {
         } else {
 	    // clone
 	    issuerX500Principals = new HashSet(issuers);
-	    issuerNames = new HashSet<Object>();
+	    issuerNames = new HashSet<>();
 	    for (X500Principal p : issuerX500Principals) {
 		issuerNames.add(p.getEncoded());
 	    }
@@ -178,7 +178,7 @@ public class X509CRLSelector implements CRLSelector {
      * @see #getIssuerNames
      */
     public void setIssuerNames(Collection<?> names) throws IOException {
-        if (names == null || names.size() == 0) {
+        if (names == null || names.isEmpty()) {
             issuerNames = null;
             issuerX500Principals = null;
         } else {
@@ -271,10 +271,10 @@ public class X509CRLSelector implements CRLSelector {
      */
     private void addIssuerNameInternal(Object name, X500Principal principal) {
         if (issuerNames == null) {
-            issuerNames = new HashSet<Object>();
+            issuerNames = new HashSet<>();
 	}
         if (issuerX500Principals == null) {
-            issuerX500Principals = new HashSet<X500Principal>();
+            issuerX500Principals = new HashSet<>();
 	}
         issuerNames.add(name);
         issuerX500Principals.add(principal);
@@ -294,7 +294,7 @@ public class X509CRLSelector implements CRLSelector {
     private static HashSet<Object> cloneAndCheckIssuerNames(Collection<?> names)
         throws IOException 
     {
-        HashSet<Object> namesCopy = new HashSet<Object>();
+        HashSet<Object> namesCopy = new HashSet<>();
         Iterator i = names.iterator();
         while (i.hasNext()) {
             Object nameObject = i.next();
@@ -346,7 +346,7 @@ public class X509CRLSelector implements CRLSelector {
      */
     private static HashSet<X500Principal> parseIssuerNames(Collection<Object> names) 
     throws IOException {
-        HashSet<X500Principal> x500Principals = new HashSet<X500Principal>();
+        HashSet<X500Principal> x500Principals = new HashSet<>();
 	for (Iterator t = names.iterator(); t.hasNext(); ) {
 	    Object nameObject = t.next();
 	    if (nameObject instanceof String) {
@@ -355,7 +355,7 @@ public class X509CRLSelector implements CRLSelector {
 		try {
 		    x500Principals.add(new X500Principal((byte[])nameObject));
 		} catch (IllegalArgumentException e) {
-		    throw (IOException)new IOException("Invalid name").initCause(e);
+		    throw new IOException("Invalid name", e);
 		}
 	    }
 	}
@@ -548,8 +548,9 @@ public class X509CRLSelector implements CRLSelector {
      * @return a <code>String</code> describing the contents of the
      *         <code>X509CRLSelector</code>.
      */
+    @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("X509CRLSelector: [\n");
         if (issuerNames != null) {
             sb.append("  IssuerNames:\n");
@@ -576,6 +577,7 @@ public class X509CRLSelector implements CRLSelector {
      * @return <code>true</code> if the <code>CRL</code> should be selected,
      *         <code>false</code> otherwise
      */
+    @Override
     public boolean match(CRL crl) {
         if (!(crl instanceof X509CRL)) {
             return false;
@@ -680,14 +682,15 @@ public class X509CRLSelector implements CRLSelector {
      *
      * @return the copy
      */
+    @Override
     public Object clone() {
         try {
             X509CRLSelector copy = (X509CRLSelector)super.clone();
             if (issuerNames != null) {
                 copy.issuerNames = 
-			new HashSet<Object>(issuerNames);
+			new HashSet<>(issuerNames);
                 copy.issuerX500Principals = 
-			new HashSet<X500Principal>(issuerX500Principals);
+			new HashSet<>(issuerX500Principals);
             }
             return copy;
         } catch (CloneNotSupportedException e) {

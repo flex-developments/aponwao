@@ -28,7 +28,7 @@ import sun.security.x509.*;
  * @version 	1.8 09/08/08
  * @author	Ram Marti	
  */
-class OCSPChecker extends PKIXCertPathChecker {
+final class OCSPChecker extends PKIXCertPathChecker {
  
     public static final String OCSP_ENABLE_PROP = "ocsp.enable";
     public static final String OCSP_URL_PROP = "ocsp.responderURL";
@@ -90,6 +90,7 @@ class OCSPChecker extends PKIXCertPathChecker {
      * Initializes the internal state of the checker from parameters
      * specified in the constructor
      */
+    @Override
     public void init(boolean forward) throws CertPathValidatorException {
 	if (!forward) {
 	    remainingCerts = certs.length + 1;
@@ -99,10 +100,12 @@ class OCSPChecker extends PKIXCertPathChecker {
 	}
     }
 
+    @Override
     public boolean isForwardCheckingSupported() {
 	return false;
     }
 
+    @Override
     public Set<String> getSupportedExtensions() {
 	return Collections.<String>emptySet();
     }
@@ -116,6 +119,7 @@ class OCSPChecker extends PKIXCertPathChecker {
      * @exception CertPathValidatorException Exception is thrown if the 
      *            certificate has been revoked.
      */
+    @Override
     public void check(Certificate cert, Collection<String> unresolvedCritExts)
 	throws CertPathValidatorException {
 
@@ -332,34 +336,28 @@ class OCSPChecker extends PKIXCertPathChecker {
 
 	    con.setRequestProperty("Content-length",
 		String.valueOf(bytes.length));
-	    OutputStream out = con.getOutputStream();
-	    out.write(bytes);
-	    out.flush();
-
-	    // Check the response
-	    if (DEBUG != null &&
-		con.getResponseCode() != HttpURLConnection.HTTP_OK) {
-		DEBUG.println("Received HTTP error: " + con.getResponseCode() +
-		    " - " + con.getResponseMessage());
-	    }
-	    InputStream in = con.getInputStream();
-
-	    int contentLength = con.getContentLength();
-	    if (contentLength == -1) {
-		contentLength = Integer.MAX_VALUE;
-	    }
-
-	    byte[] response = new byte[contentLength];
-	    int total = 0;
-	    int count = 0;
-	    while (count != -1 && total < contentLength) {
-	        count = in.read(response, total, response.length - total);
-	        total += count;
-	    }
-
-	    // clean-up
-	    in.close();
-	    out.close();
+            byte[] response;
+            try (OutputStream out = con.getOutputStream()) {
+                out.write(bytes);
+                out.flush();
+                // Check the response
+                if (DEBUG != null &&
+                        con.getResponseCode() != HttpURLConnection.HTTP_OK) {
+                    DEBUG.println("Received HTTP error: " + con.getResponseCode() +
+                            " - " + con.getResponseMessage());
+                }  try (InputStream in = con.getInputStream()) {
+                    int contentLength = con.getContentLength();
+                    if (contentLength == -1) {
+                        contentLength = Integer.MAX_VALUE;
+                    }   response = new byte[contentLength];
+                    int total = 0;
+                    int count = 0;
+                    while (count != -1 && total < contentLength) {
+                        count = in.read(response, total, response.length - total);
+                        total += count;
+                    }   // clean-up
+                }
+            }
 
 	    OCSPResponse ocspResponse = new OCSPResponse(response, pkixParams,
 		responderCert);
@@ -391,7 +389,7 @@ class OCSPChecker extends PKIXCertPathChecker {
 	    throw cre;
 	} catch (CertPathValidatorException cpve) {
 	    throw cpve;
-	} catch (Exception e) {
+	} catch (CertificateException | IOException | CertStoreException e) {
 	    throw new CertPathValidatorException(e);
 	}
     }
@@ -462,6 +460,7 @@ class OCSPChecker extends PKIXCertPathChecker {
 
 	AccessController.doPrivileged(
 	    new PrivilegedAction() {
+                @Override
 		public Object run() {
 		    properties[0] = Security.getProperty(OCSP_URL_PROP);
 		    properties[1] =

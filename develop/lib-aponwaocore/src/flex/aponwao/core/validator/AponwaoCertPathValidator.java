@@ -71,9 +71,9 @@ public class AponwaoCertPathValidator {
      */
     private static final String CPV_TYPE = "certpathvalidator.type";
     private static final Debug debug = Debug.getInstance("certpath");
-    private CertPathValidatorSpi validatorSpi;
-    private Provider provider;
-    private String algorithm;
+    private final CertPathValidatorSpi validatorSpi;
+    private final Provider provider;
+    private final String algorithm;
 
     /**
      * Creates a <code>CertPathValidator</code> object of the given algorithm, 
@@ -282,6 +282,7 @@ public class AponwaoCertPathValidator {
     public final static String getDefaultType() {
         String cpvtype;
         cpvtype = (String)AccessController.doPrivileged(new PrivilegedAction() {
+            @Override
             public Object run() {
                 return Security.getProperty(CPV_TYPE);
             }

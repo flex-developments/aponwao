@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.cert.CRLException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertPath;
@@ -63,7 +64,7 @@ import sun.security.x509.X509CertImpl;
  * @author	Seth Proctor
  * @author	Steve Hanna
  */
-class CrlRevocationChecker extends PKIXCertPathChecker {
+final class CrlRevocationChecker extends PKIXCertPathChecker {
  
     private static final Debug debug = Debug.getInstance("certpath");
     private final PublicKey mInitPubKey;
@@ -136,6 +137,7 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
      * Initializes the internal state of the checker from parameters
      * specified in the constructor
      */
+    @Override
     public void init(boolean forward) throws CertPathValidatorException
     {
 	if (!forward) {
@@ -147,10 +149,12 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
 	}
     }
 
+    @Override
     public boolean isForwardCheckingSupported() {
 	return false;
     }
 
+    @Override
     public Set<String> getSupportedExtensions() {
 	return null;
     }
@@ -165,6 +169,7 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
      * @exception CertPathValidatorException Exception thrown if
      * certificate does not verify
      */
+    @Override
     public void check(Certificate cert, Collection<String> unresolvedCritExts)
         throws CertPathValidatorException
     {
@@ -220,7 +225,7 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
 	    if (kbools != null) {
 		KeyUsageExtension ku = new KeyUsageExtension(kbools);
 		Boolean b = (Boolean) ku.get(KeyUsageExtension.CRL_SIGN);
-		return b.booleanValue();
+		return b;
 	    } else {
 		return true;
 	    }
@@ -292,8 +297,8 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
  	}
 
 	// init the state for this run
-	mPossibleCRLs = new HashSet<X509CRL>();
-	mApprovedCRLs = new HashSet<X509CRL>();
+	mPossibleCRLs = new HashSet<>();
+	mApprovedCRLs = new HashSet<>();
 	boolean[] reasonsMask = new boolean[9];
 
 	try {
@@ -385,8 +390,8 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
 		    // to a reasonCode value of unspecified (0)
 		    reasonCode = (reason == null
 			? CRLReasonCodeExtension.UNSPECIFIED
-		        : reason.intValue());
- 	        } catch (Exception e) {
+		        : reason);
+ 	        } catch (CRLException | IOException e) {
 		    throw new CertPathValidatorException(e);
 	        }
 
@@ -488,7 +493,7 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
  	// If it doesn't check out, try to find a different key.
  	// And if we can't find a key, then return false.
  	try {
- 	    Set<PublicKey> badKeys = new HashSet<PublicKey>();
+ 	    Set<PublicKey> badKeys = new HashSet<>();
  	    if (prevKey != null) {
  		badKeys.add(prevKey);
 	    }
@@ -586,7 +591,7 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
  	    // we could get a CRL from a different PKI.
  	    if (mInitPubKey != null) {
  		Set<TrustAnchor> oldAnchors = builderParams.getTrustAnchors();
- 		Set<TrustAnchor> newAnchors = new HashSet<TrustAnchor>();
+ 		Set<TrustAnchor> newAnchors = new HashSet<>();
  		for (TrustAnchor ta : oldAnchors) {
  		    PublicKey pubKey = ta.getCAPublicKey();
  		    if (pubKey != null) {
@@ -663,9 +668,9 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
  	    // Now check revocation of all certs in path, assuming that
  	    // the stackedCerts are revoked.
  	    if (stackedCerts == null) {
- 		stackedCerts = new HashSet<X509Certificate>();
+ 		stackedCerts = new HashSet<>();
  	    } else {
- 		stackedCerts = new HashSet<X509Certificate>(stackedCerts);
+ 		stackedCerts = new HashSet<>(stackedCerts);
  	    }
  	    stackedCerts.add(currCert);
  	    TrustAnchor ta = cpbr.getTrustAnchor();
@@ -697,14 +702,8 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
  			      " got key " + cpbr.getPublicKey());
 	    }
  	    return cpbr.getPublicKey();
- 	} catch (InvalidAlgorithmParameterException iape) {
+ 	} catch (InvalidAlgorithmParameterException | IOException | NoSuchAlgorithmException | CertPathValidatorException iape) {
  	    throw new CertPathBuilderException(iape);
- 	} catch (IOException ioe) {
- 	    throw new CertPathBuilderException(ioe);
- 	} catch (NoSuchAlgorithmException nsae) {
- 	    throw new CertPathBuilderException(nsae);
- 	} catch (CertPathValidatorException cpve) {
- 	    throw new CertPathBuilderException(cpve);
  	}
     }
 
@@ -728,7 +727,7 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
  	 *                      if no such check should be done
  	 */
  	RejectKeySelector(Collection<PublicKey> badPublicKeys) {
- 	    this.badKeySet = new HashSet<PublicKey>(badPublicKeys);
+ 	    this.badKeySet = new HashSet<>(badPublicKeys);
  	}
  
  	/**
@@ -738,6 +737,7 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
  	 * @return <code>true</code> if the <code>Certificate</code> should be
  	 *         selected, <code>false</code> otherwise
  	 */
+         @Override
  	public boolean match(Certificate cert) {
  	    if (!super.match(cert))
  		return(false);
@@ -759,6 +759,7 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
  	 * @return a <code>String</code> describing the contents of the
  	 *         <code>CertSelector</code>
  	 */
+         @Override
  	public String toString() {
  	    StringBuilder sb = new StringBuilder();
  	    sb.append("RejectCertSelector: [\n");
@@ -831,7 +832,7 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
             } else {
                 points = (List)ext.get(CRLDistributionPointsExtension.POINTS);
 	    }
-            Set<X509CRL> results = new HashSet<X509CRL>();
+            Set<X509CRL> results = new HashSet<>();
 	    DistributionPointFetcher dpf = 
 	        DistributionPointFetcher.getInstance();
             for (Iterator t = points.iterator();
@@ -845,7 +846,7 @@ class CrlRevocationChecker extends PKIXCertPathChecker {
 		}
             }
 	    return results;
-        } catch (Exception e) {
+        } catch (CertificateException | IOException | CRLException e) {
 	    if (debug != null) {
 	        debug.println("Exception while verifying CRL: "+e.getMessage());
 	    }

@@ -99,6 +99,7 @@ public class PreferencesHelper {
 	public static final String FILEDIALOG_PATH = "filedialog.path";
         
         //OJO... Modificacion Felix
+        public static final String APPEARANCE_FONT_SIZE = "appearance.font.size";
         public static final String APPEARANCE_CODBARRA_X = "appearance.codbarra.x";
         public static final String APPEARANCE_CODBARRA_Y = "appearance.codbarra.y";
         public static final String APPEARANCE_CODBARRA_WIDTH = "appearance.codbarra.width";
@@ -106,6 +107,8 @@ public class PreferencesHelper {
         public static final String APPEARANCE_CODBARRA_ENABLE = "appearance.codbarra.enable";
         public static final String APPEARANCE_CODBARRA_PATH = "appearance.codbarra.path";
         public static final String APPEARANCE_CORRELATIVO_ENABLE = "appearance.correlativo.enable";
+        public static final String APPEARANCE_CORRELATIVO_PAGE = "appearance.correlativo.page";
+        public static final String APPEARANCE_CORRELATIVO_FONT_SIZE = "appearance.correlativo.font.size";
         public static final String APPEARANCE_COLETILLA_FACTURA = "appearance.coletilla.factura";
         public static final String APPEARANCE_COLETILLA_FACTURA_X = "appearance.coletilla.factura.x";
         public static final String APPEARANCE_COLETILLA_FACTURA_SUFIX_FILE = PREFERENCES_PATH + File.separatorChar + "coletilla.conf";
@@ -237,7 +240,7 @@ public class PreferencesHelper {
 
 	public static Map<String, String> getHardwarePreferences() {
 
-		Map<String, String> map = new TreeMap<String, String>();
+		Map<String, String> map = new TreeMap<>();
 
 		// leer el csv
 		List<List<String>> array = ExportHelper.importCSV(HARDWARE_PREFERENCES_FILE);
@@ -257,7 +260,7 @@ public class PreferencesHelper {
 
 	private static Map<String, String> loadSoftwarePreferences() {
 
-		Map<String, String> map = new TreeMap<String, String>();
+		Map<String, String> map = new TreeMap<>();
 
 		// leer el csv
 		List<List<String>> array = ExportHelper.importCSV(SOFTWARE_PREFERENCES_FILE);
@@ -286,10 +289,10 @@ public class PreferencesHelper {
 
 	public static void saveSoftwarePreferences(Map<String, String> map) {
 
-		List<List<String>> array = new ArrayList<List<String>>();
+		List<List<String>> array = new ArrayList<>();
 
 		// header
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		list.add(0, "name");
 		list.add(1, "path");
 		array.add(list);
@@ -297,7 +300,7 @@ public class PreferencesHelper {
 		for (String name : map.keySet()) {
 
 			String path = map.get(name);
-			list = new ArrayList<String>();
+			list = new ArrayList<>();
 			list.add(0, name);
 			list.add(1, path);
 			array.add(list);
@@ -312,10 +315,10 @@ public class PreferencesHelper {
         //OJO.. Modificacion Yessica
         public static void saveHardwarePreferences(Map<String, String> map) {
 
-		List<List<String>> array = new ArrayList<List<String>>();
+		List<List<String>> array = new ArrayList<>();
 
 		// header
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		list.add(0, "name");
 		list.add(1, "path");
 		array.add(list);
@@ -323,7 +326,7 @@ public class PreferencesHelper {
 		for (String name : map.keySet()) {
 
 			String path = map.get(name);
-			list = new ArrayList<String>();
+			list = new ArrayList<>();
 			list.add(0, name);
 			list.add(1, path);
 			array.add(list);
@@ -335,10 +338,10 @@ public class PreferencesHelper {
 
         public static void saveTimestampPreferences(Map<String, TimeStampPreferences> map) {
 
-                List<List<String>> array = new ArrayList<List<String>>();
+                List<List<String>> array = new ArrayList<>();
 
 		// header
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		list.add(0, "name");
 		list.add(1, "url");
                 list.add(2, "user");
@@ -347,7 +350,7 @@ public class PreferencesHelper {
 
 		for (String name : map.keySet()) {
 
-			list = new ArrayList<String>();
+			list = new ArrayList<>();
                         String url = map.get(name).getUrl(); if(url==null) url="null";
                         String user = map.get(name).getUser(); if(user==null) user="null";
                         String password = map.get(name).getPassword(); if(password==null) password="null";
@@ -365,9 +368,9 @@ public class PreferencesHelper {
 
         public static void saveImagePreferences(Map<String, ImageSignPreferences> map) {
 
-                List<List<String>> array = new ArrayList<List<String>>();
+                List<List<String>> array = new ArrayList<>();
 
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 		list.add(0, "name");
 		list.add(1, "type");
                 list.add(2, "path");
@@ -383,7 +386,7 @@ public class PreferencesHelper {
 
 		for (String name : map.keySet()) {
 
-			list = new ArrayList<String>();
+			list = new ArrayList<>();
                         String type = map.get(name).getType();
                         String imageVisible = map.get(name).getImageVisible();
                         String path = map.get(name).getPath();
@@ -412,7 +415,7 @@ public class PreferencesHelper {
 	}
 
         public static Map<String, ImageSignPreferences> getImagePreferences() {
-            Map<String, ImageSignPreferences> map = new TreeMap<String, ImageSignPreferences>();
+            Map<String, ImageSignPreferences> map = new TreeMap<>();
             // leer el csv
             List<List<String>> array = ExportHelper.importCSV(IMAGE_PREFERENCES_FILE);
             for (int i = 1; i < array.size(); i++) {
@@ -443,13 +446,7 @@ public class PreferencesHelper {
 			ks = KeyStore.getInstance(KeyStore.getDefaultType());
 			ks.load(fis, password);
 
-		} catch (KeyStoreException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (CertificateException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (IOException e) {
+		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
 			logger.log(Level.SEVERE, "", e);
 		}
 
@@ -489,13 +486,7 @@ public class PreferencesHelper {
 		try {
 			ks.store(fos, password);
 
-		} catch (KeyStoreException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (NoSuchAlgorithmException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (CertificateException e) {
-			logger.log(Level.SEVERE, "", e);
-		} catch (IOException e) {
+		} catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
 			logger.log(Level.SEVERE, "", e);
 		}
 
@@ -514,7 +505,7 @@ public class PreferencesHelper {
 	}
         
         public static Map<String, TimeStampPreferences> getTimestampPreferencesNew() {
-            Map<String, TimeStampPreferences> map = new TreeMap<String, TimeStampPreferences>();
+            Map<String, TimeStampPreferences> map = new TreeMap<>();
             // leer el csv
             List<List<String>> array = ExportHelper.importCSV(TIMESTAMP_PREFERENCES_FILE);
             for (int i = 1; i < array.size(); i++) {

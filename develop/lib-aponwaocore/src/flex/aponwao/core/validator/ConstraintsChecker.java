@@ -31,7 +31,7 @@ import sun.security.x509.X509CertImpl;
  * @since	1.4
  * @author	Yassir Elley
  */
-class ConstraintsChecker extends PKIXCertPathChecker {
+final class ConstraintsChecker extends PKIXCertPathChecker {
  
     private static final Debug debug = Debug.getInstance("certpath");
     /* length of cert path */
@@ -55,6 +55,7 @@ class ConstraintsChecker extends PKIXCertPathChecker {
 	init(false);
     }
     
+    @Override
     public void init(boolean forward) throws CertPathValidatorException {
 	if (!forward) {
 	    i = 0;
@@ -66,13 +67,15 @@ class ConstraintsChecker extends PKIXCertPathChecker {
 	}
     }
 
+    @Override
     public boolean isForwardCheckingSupported() {
 	return false;
     }
 
+    @Override
     public Set<String> getSupportedExtensions() {
 	if (supportedExts == null) {
-	    supportedExts = new HashSet<String>();
+	    supportedExts = new HashSet<>();
 	    supportedExts.add(PKIXExtensions.BasicConstraints_Id.toString());
 	    supportedExts.add(PKIXExtensions.NameConstraints_Id.toString());
 	    supportedExts = Collections.unmodifiableSet(supportedExts);
@@ -90,6 +93,7 @@ class ConstraintsChecker extends PKIXCertPathChecker {
      * @throws CertPathValidatorException if the specified certificate 
      * does not pass the check
      */
+    @Override
     public void check(Certificate cert, Collection<String> unresCritExts) 
         throws CertPathValidatorException
     {

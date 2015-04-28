@@ -10,6 +10,8 @@ package flex.aponwao.core.validator;
 import java.io.IOException;
 import java.net.URI;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
 import java.security.cert.*;
 import java.util.*;
 import javax.security.auth.x500.X500Principal;
@@ -254,7 +256,7 @@ public abstract class Builder {
 	try {
 	    certImpl = X509CertImpl.toImpl(cert);
 	} catch (CertificateException e) {
-	    throw (IOException)new IOException("Invalid certificate").initCause(e);
+	    throw new IOException("Invalid certificate", e);
 	}
 	/* see if certificate subject matches target */
 	X500Name subject = X500Name.asX500Name(certImpl.getSubjectX500Principal());
@@ -267,7 +269,7 @@ public abstract class Builder {
 	    certImpl.getSubjectAlternativeNameExtension();
 	if (altNameExt != null) {
 	    GeneralNames altNames = 
-	    	(GeneralNames)altNameExt.get(altNameExt.SUBJECT_NAME);
+	    	(GeneralNames)altNameExt.get(SubjectAlternativeNameExtension.SUBJECT_NAME);
 	    /* see if any alternative name matches target */	
 	    if (altNames != null) {
 		for (int j = 0, n = altNames.size(); j < n; j++) {
@@ -306,7 +308,7 @@ public abstract class Builder {
 	GeneralSubtrees permitted = (GeneralSubtrees)
 	    constraints.get(constraints.PERMITTED_SUBTREES);
 	GeneralSubtrees excluded = (GeneralSubtrees)
-	    constraints.get(constraints.EXCLUDED_SUBTREES);
+	    constraints.get(NameConstraintsExtension.EXCLUDED_SUBTREES);
 	if (permitted != null) {
 	    permitted.reduce(excluded);
 	}
@@ -332,8 +334,7 @@ public abstract class Builder {
 		    return (distance + 1);
 		}
 	    } catch (IOException ioe) {
-		/* names are of different types */
-		continue;
+                /* names are of different types */
 	    }
 	}
 	/* no matching type in permitted; cert holder could certify target */
@@ -371,7 +372,7 @@ public abstract class Builder {
         } else {
             // we just return an empty set to make sure that there is
             // at least a certificate policies extension in the cert
-            return new HashSet<String>();
+            return new HashSet<>();
         }
     }
     
@@ -451,7 +452,7 @@ public abstract class Builder {
 
         try {
 	    return LDAPCertStore.getInstance(LDAPCertStore.getParameters(uri));
-        } catch (Exception ex) {
+        } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException ex) {
 	    if (debug != null) {
 	        debug.println("Builder.createCertStore(AccessDescription): "
 		    + "non-fatal exception creating CertStore: " + ex);

@@ -34,7 +34,7 @@ import sun.security.x509.InhibitAnyPolicyExtension;
  * @since	1.4
  * @author	Yassir Elley
  */
-class PolicyChecker extends PKIXCertPathChecker {
+final class PolicyChecker extends PKIXCertPathChecker {
  
     private final Set initPolicies;
     private final int certPathLen;
@@ -95,6 +95,7 @@ class PolicyChecker extends PKIXCertPathChecker {
      * @exception CertPathValidatorException Exception thrown if user
      * wants to enable forward checking and forward checking is not supported.
      */
+    @Override
     public void init(boolean forward) throws CertPathValidatorException {
 	if (forward) {
 	    throw new CertPathValidatorException
@@ -115,6 +116,7 @@ class PolicyChecker extends PKIXCertPathChecker {
      *
      * @return true if forward checking is supported, false otherwise
      */
+    @Override
     public boolean isForwardCheckingSupported() {
 	return false;
     }
@@ -129,9 +131,10 @@ class PolicyChecker extends PKIXCertPathChecker {
      * @return the Set of extensions supported by this PKIXCertPathChecker,
      * or null if no extensions are supported
      */
+    @Override
     public Set<String> getSupportedExtensions() {
 	if (supportedExts == null) {
-	    supportedExts = new HashSet<String>();
+	    supportedExts = new HashSet<>();
 	    supportedExts.add(PKIXExtensions.CertificatePolicies_Id.toString());
 	    supportedExts.add(PKIXExtensions.PolicyMappings_Id.toString());
 	    supportedExts.add(PKIXExtensions.PolicyConstraints_Id.toString());
@@ -150,6 +153,7 @@ class PolicyChecker extends PKIXCertPathChecker {
      * @exception CertPathValidatorException Exception thrown if
      * the certificate does not verify.
      */
+    @Override
     public void check(Certificate cert, Collection<String> unresCritExts) 
 	throws CertPathValidatorException
     {
@@ -254,7 +258,7 @@ class PolicyChecker extends PKIXCertPathChecker {
 	    if (polConstExt == null)
 		return explicitPolicy;
             int require = ((Integer) 
-		polConstExt.get(PolicyConstraintsExtension.REQUIRE)).intValue();
+                    polConstExt.get(PolicyConstraintsExtension.REQUIRE));
 	    if (debug != null) {
 	        debug.println("PolicyChecker.mergeExplicitPolicy() "
                    + "require Index from cert = " + require);
@@ -308,7 +312,7 @@ class PolicyChecker extends PKIXCertPathChecker {
 		return policyMapping;
 
             int inhibit = ((Integer) 
-		polConstExt.get(PolicyConstraintsExtension.INHIBIT)).intValue();
+                    polConstExt.get(PolicyConstraintsExtension.INHIBIT));
             if (debug != null)
                 debug.println("PolicyChecker.mergePolicyMapping() "
                     + "inhibit Index from cert = " + inhibit);
@@ -356,7 +360,7 @@ class PolicyChecker extends PKIXCertPathChecker {
 		return inhibitAnyPolicy;
 
             int skipCerts = ((Integer) 
-		inhAnyPolExt.get(InhibitAnyPolicyExtension.SKIP_CERTS)).intValue();
+                    inhAnyPolExt.get(InhibitAnyPolicyExtension.SKIP_CERTS));
             if (debug != null)
                 debug.println("PolicyChecker.mergeInhibitAnyPolicy() "
                     + "skipCerts Index from cert = " + skipCerts);

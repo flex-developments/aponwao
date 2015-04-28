@@ -126,7 +126,7 @@ class OCSPRequest {
     }
     
     private static class SingleRequest {
-	private CertId certId;	
+	private final CertId certId;	
 
 	// No extensions are set
 

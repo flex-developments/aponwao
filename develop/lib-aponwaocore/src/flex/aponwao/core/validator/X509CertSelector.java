@@ -263,7 +263,7 @@ public class X509CertSelector implements CertSelector {
 	try {
 	    issuer = (issuerDN == null ? null : new X500Principal(issuerDN));
 	} catch (IllegalArgumentException e) {
-	    throw (IOException)new IOException("Invalid name").initCause(e);
+	    throw new IOException("Invalid name", e);
 	}
     }
   
@@ -327,7 +327,7 @@ public class X509CertSelector implements CertSelector {
 	try {
 	    subject = (subjectDN == null ? null : new X500Principal(subjectDN));
 	} catch (IllegalArgumentException e) {
-	    throw (IOException)new IOException("Invalid name").initCause(e);
+	    throw new IOException("Invalid name", e);
 	}
     }
 
@@ -605,8 +605,8 @@ public class X509CertSelector implements CertSelector {
 	    keyPurposeOIDSet = null;
 	} else {
 	    this.keyPurposeSet = 
-		Collections.unmodifiableSet(new HashSet<String>(keyPurposeSet));
-	    keyPurposeOIDSet = new HashSet<ObjectIdentifier>();
+		Collections.unmodifiableSet(new HashSet<>(keyPurposeSet));
+	    keyPurposeOIDSet = new HashSet<>();
 	    for (String s : this.keyPurposeSet) {
 		keyPurposeOIDSet.add(new ObjectIdentifier(s));
 	    }
@@ -800,13 +800,13 @@ public class X509CertSelector implements CertSelector {
 	// First, ensure that the name parses
 	GeneralNameInterface tempName = makeGeneralNameInterface(type, name);
 	if (subjectAlternativeNames == null) {
-	    subjectAlternativeNames = new HashSet<List<?>>();
+	    subjectAlternativeNames = new HashSet<>();
 	}
 	if (subjectAlternativeGeneralNames == null) {
-	    subjectAlternativeGeneralNames = new HashSet<GeneralNameInterface>();
+	    subjectAlternativeGeneralNames = new HashSet<>();
 	}
-	List<Object> list = new ArrayList<Object>(2);
-	list.add(Integer.valueOf(type));
+	List<Object> list = new ArrayList<>(2);
+	list.add(type);
 	list.add(name);
 	subjectAlternativeNames.add(list);
 	subjectAlternativeGeneralNames.add(tempName);
@@ -830,7 +830,7 @@ public class X509CertSelector implements CertSelector {
      * @throws IOException if a parsing error occurs
      */
     private static Set<GeneralNameInterface> parseNames(Collection<List<?>> names) throws IOException {
-	Set<GeneralNameInterface> genNames = new HashSet<GeneralNameInterface>();
+	Set<GeneralNameInterface> genNames = new HashSet<>();
 	Iterator<List<?>> i = names.iterator();
 	while (i.hasNext()) {
 	    Object o = i.next();
@@ -845,7 +845,7 @@ public class X509CertSelector implements CertSelector {
 	    if (!(o instanceof Integer)) {
 		throw new IOException("expected an Integer");
 	    }
-	    int nameType = ((Integer)o).intValue();
+	    int nameType = ((Integer)o);
 	    o = nameList.get(1);
 	    genNames.add(makeGeneralNameInterface(nameType, o));
 	}
@@ -1086,10 +1086,10 @@ public class X509CertSelector implements CertSelector {
 	} else {
 	    // Snapshot set and parse it
 	    Set<String> tempSet = Collections.unmodifiableSet
-	    				(new HashSet<String>(certPolicySet));
+	    				(new HashSet<>(certPolicySet));
 	    /* Convert to Vector of ObjectIdentifiers */
 	    Iterator i = tempSet.iterator();
-	    Vector<CertificatePolicyId> polIdVector = new Vector<CertificatePolicyId>();
+	    Vector<CertificatePolicyId> polIdVector = new Vector<>();
 	    while (i.hasNext()) {
 		Object o = i.next();
 		if (!(o instanceof String)) {
@@ -1257,11 +1257,11 @@ public class X509CertSelector implements CertSelector {
 	// First, ensure that the name parses
 	GeneralNameInterface tempName = makeGeneralNameInterface(type, name);
 	if (pathToGeneralNames == null) {
-	    pathToNames = new HashSet<List<?>>();
-	    pathToGeneralNames = new HashSet<GeneralNameInterface>();
+	    pathToNames = new HashSet<>();
+	    pathToGeneralNames = new HashSet<>();
 	}
-	List<Object> list = new ArrayList<Object>(2);
-	list.add(Integer.valueOf(type));
+	List<Object> list = new ArrayList<>(2);
+	list.add(type);
 	list.add(name);
 	pathToNames.add(list);
 	pathToGeneralNames.add(tempName);
@@ -1661,14 +1661,14 @@ public class X509CertSelector implements CertSelector {
      */
     private static Set<List<?>> cloneAndCheckNames(Collection<List<?>> names) throws IOException {
 	// Copy the Lists and Collection
-	Set<List<?>> namesCopy = new HashSet<List<?>>();
+	Set<List<?>> namesCopy = new HashSet<>();
 	Iterator<List<?>> i = names.iterator();
 	while (i.hasNext()) {
 	    Object o = i.next();
 	    if (!(o instanceof List)) {
 		throw new IOException("expected a List");
 	    }
-	    namesCopy.add(new ArrayList<Object>((List<?>)o));
+	    namesCopy.add(new ArrayList<>((List<?>)o));
 	}
     
 	// Check the contents of the Lists and clone any byte arrays
@@ -1682,7 +1682,7 @@ public class X509CertSelector implements CertSelector {
 	    if (!(o instanceof Integer)) {
 		throw new IOException("expected an Integer");
 	    }
-	    int nameType = ((Integer) o).intValue();
+	    int nameType = ((Integer) o);
 	    if ((nameType < 0) || (nameType > 8)) {
 		throw new IOException("name type not 0-8");
 	    }
@@ -1804,8 +1804,9 @@ public class X509CertSelector implements CertSelector {
      * @return a <code>String</code> describing the contents of the
      *         <code>CertSelector</code>
      */
+    @Override
     public String toString() {
-	StringBuffer sb = new StringBuffer();
+	StringBuilder sb = new StringBuilder();
 	sb.append("X509CertSelector: [\n");
 	if (x509Cert != null) {
 	    sb.append("  Certificate: " + x509Cert.toString() + "\n");
@@ -1990,6 +1991,7 @@ public class X509CertSelector implements CertSelector {
      * @return <code>true</code> if the <code>Certificate</code> should be
      *         selected, <code>false</code> otherwise
      */
+    @Override
     public boolean match(Certificate cert) {
 	if (!(cert instanceof X509Certificate)) {
 	    return false;
@@ -2400,7 +2402,7 @@ public class X509CertSelector implements CertSelector {
 	     * Convert the Vector of PolicyInformation to a Vector 
 	     * of CertificatePolicyIds for easier comparison.
 	     */
-	    List<CertificatePolicyId> policyIDs = new ArrayList<CertificatePolicyId>(policies.size());
+	    List<CertificatePolicyId> policyIDs = new ArrayList<>(policies.size());
 	    for (PolicyInformation info : policies) {
 		policyIDs.add(info.getPolicyIdentifier());
 	    }
@@ -2456,7 +2458,7 @@ public class X509CertSelector implements CertSelector {
 	    if (ext == null) {
 		return true;
 	    }
-	    if ((debug != null) && debug.isOn("certpath")) {
+	    if ((debug != null) && Debug.isOn("certpath")) {
 		debug.println("X509CertSelector.match pathToNames:\n");
 		Iterator i = pathToGeneralNames.iterator();
 		while (i.hasNext()) {
@@ -2590,7 +2592,7 @@ public class X509CertSelector implements CertSelector {
 	    Object clone = ((HashSet<?>)set).clone();
 	    return (Set<?>)clone;
 	} else {
-	    return new HashSet<Object>(set);
+	    return new HashSet<>(set);
 	}
     }
 
@@ -2599,6 +2601,7 @@ public class X509CertSelector implements CertSelector {
      *
      * @return the copy
      */
+    @Override
     public Object clone() {
 	try {
 	    X509CertSelector copy = (X509CertSelector)super.clone();
