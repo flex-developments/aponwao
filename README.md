@@ -8,6 +8,7 @@ Inicialmente aponwao Versión 1 nace como un fork de las primeras versiones de S
 ## Versión 2: Copyright (C) 2015 - Grupo de desarrollo de Aponwao
  * Desarrolladores y Colaboradores de Aponwao (https://github.com/suscerte)
    * Ing. Axel Díaz - diaz.axelio en gmail.com
+   * Ing. Félix D. López M. - flex.developments en gmail.com
 
 Desarrollo apoyado por la Superintendencia de Servicios de Certificación Electrónica (SUSCERTE) durante 2015 a través de:
  * Ing. Axel Díaz - diaz.axelio en gmail.com | adíaz en suscerte.gob.ve
