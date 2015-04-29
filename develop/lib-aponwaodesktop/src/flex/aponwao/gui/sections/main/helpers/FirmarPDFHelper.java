@@ -824,9 +824,9 @@ public class FirmarPDFHelper {
                     PdfDictionary dic2 = new PdfDictionary();
                     dic2.put(PdfName.CONTENTS, new PdfString(paddedSig).setHexWriting(true));
                     sap.close(dic2);
-                    
-                    result = sap.getSignDate().toString();
                 }
+                
+                result = sap.getSignDate().toString();
                 
                 if(sobreescribir) {
                     //ExportHelper.deleteFile(rutaDestinoDef);
