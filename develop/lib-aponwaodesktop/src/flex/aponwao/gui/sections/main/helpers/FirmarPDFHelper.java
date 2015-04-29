@@ -666,7 +666,8 @@ public class FirmarPDFHelper {
                             writer.append(
                                 correlativo + ";" +
                                 CertificateHelper.getCN((X509Certificate) ks.getCertificateChain(alias)[0]) + ";" +
-                                "en fecha " + DateFormat.getDateInstance().format(signDate) + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(signDate)
+                                "en fecha " + DateFormat.getDateInstance().format(signDate) + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(signDate) +
+                                "\n"
                             );
                         } catch (KeyStoreException ex) {
                             throw new IOException(ex);
