@@ -52,7 +52,7 @@ public class FirmarPDFProgress implements IRunnableWithProgress {
 
     @Override
     public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-        List<PDFInfo> aux = new ArrayList<PDFInfo>();
+        List<PDFInfo> aux = new ArrayList<>();
         
         for (PDFInfo pdfParaFirmar : this.pdfListaParaFirmar) {
                 aux.clear();
@@ -115,13 +115,13 @@ public class FirmarPDFProgress implements IRunnableWithProgress {
         File destino = new File(dirDestino);
         destino.mkdirs();
         
-        List<File> fileList = new ArrayList<File>();
+        List<File> fileList = new ArrayList<>();
         if (dirOrigen != null) {
                 File dirFile = new File(dirOrigen);
                 fileList = FileDialogs.getFilesFromDir(dirFile, FileDialogs.PDF_TYPE);
         }
         
-        List<PDFInfo> result = new ArrayList<PDFInfo>();
+        List<PDFInfo> result = new ArrayList<>();
         for(File ruta: fileList) {
             PDFInfo temp = new PDFInfo();
             temp.setOrigen(ruta.getAbsolutePath());

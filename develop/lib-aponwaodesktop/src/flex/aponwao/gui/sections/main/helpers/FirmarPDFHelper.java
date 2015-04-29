@@ -68,25 +68,33 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStore.PasswordProtection;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
+import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.IIOException;
 import javax.security.auth.login.LoginException;
 import javax.swing.JOptionPane;
 import org.eclipse.swt.widgets.Display;
@@ -477,9 +485,9 @@ public class FirmarPDFHelper {
                 //Armo coletilla------------------------------------------------
                 List<String> coletilla = new ArrayList<>();
                 try {
-                    File temp = new File(PreferencesHelper.APPEARANCE_COLETILLA_FACTURA_SUFIX_FILE);
-                    BufferedReader entrada = new BufferedReader( new FileReader( temp ) );
-                    if(temp.exists()) {
+                    File tempp = new File(PreferencesHelper.APPEARANCE_COLETILLA_FACTURA_SUFIX_FILE);
+                    BufferedReader entrada = new BufferedReader( new FileReader( tempp ) );
+                    if(tempp.exists()) {
                         do {
                             String linea = entrada.readLine();
                             if(linea==null) break;
@@ -529,7 +537,7 @@ public class FirmarPDFHelper {
                 reader.close();
                 stamper.close();
 
-            } catch (Exception e) {
+            } catch (IOException | DocumentException | NumberFormatException e) {
                 logger.log(Level.SEVERE, "", e);
                 Display.getDefault().syncExec(new ProgressWriter(ProgressWriter.ERROR, LanguageResource.getLanguage().getString("error.sign")));
                 rutaDestino = null;
@@ -574,8 +582,8 @@ public class FirmarPDFHelper {
             sobreescribir = false;
             String carpetaRespaldo = getCarpetaResplado();
             String rutaDestinoDuplicados = getRutaDestinoDuplicados(pdfParameter);
-            List<String> rutasDestino = new ArrayList<String>();
-            List<String> seriales = new ArrayList<String>();
+            List<String> rutasDestino = new ArrayList<>();
+            List<String> seriales = new ArrayList<>();
 
             //Leer seriales
             if (PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.APPEARANCE_CODBARRA_ENABLE)){
@@ -629,6 +637,11 @@ public class FirmarPDFHelper {
 
             if (validarSobreescrituraDuplicado()) {
                 int cont = 0;
+                
+                FileWriter writer = null;
+                //Validar generacion de CSV
+                if(PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.DUPLICADO_CSV_ENABLE))
+                    writer = new FileWriter(rutaDestinoDuplicados + "-Lista Firmados-" + new Date() + ".csv");
                 for(int correlativo=inicioCorrelativo; correlativo<=finCorrelativo; correlativo++) {
                     System.out.println(correlativo);
                     String rutaOrigen = pdfParameter.getOrigen();
@@ -639,20 +652,32 @@ public class FirmarPDFHelper {
                         rutaOrigen = addFirmaEstatica(rutaOrigen, alias);
 
                     //Agregar Correlativo
-                    //OJO... Preguntar por la pagina y preguntar si desea agregar el correlativo
                     if (PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.APPEARANCE_CORRELATIVO_ENABLE))
                         rutaOrigen = addCorrelativo(rutaOrigen, correlativo, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CORRELATIVO_PAGE));
 
                     //Agregar Codigo de Barras
-                    //OJO... Preguntar por la pagina
                     if (PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.APPEARANCE_CODBARRA_ENABLE))
-                        rutaOrigen = addSerialEnBarras(rutaOrigen, seriales.get(cont), 1);
+                        rutaOrigen = addSerialEnBarras(rutaOrigen, seriales.get(cont), PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CODBARRA_PAGE));
 
-                    finalizarFirma(rutaOrigen, alias, rutasDestino.get(cont));
-
+                    String sigDate = finalizarFirma(rutaOrigen, alias, rutasDestino.get(cont));
+                    
+                    //Escribir linea en el csv
+                    if (writer!=null) {
+                        try {
+                            writer.append(
+                                correlativo + ";" +
+                                CertificateHelper.getCN((X509Certificate) ks.getCertificateChain(alias)[0]) + ";" +
+                                "en fecha " + sigDate
+                            );
+                        } catch (KeyStoreException ex) {
+                            throw new IOException(ex);
+                        }
+                    }
                     cont++;
                 }
 
+                if (writer!=null) writer.close();
+                
                 respaldar(pdfParameter.getOrigen(), carpetaRespaldo);
                 limpiarTemporales();
                 seriales.clear(); seriales = null;
@@ -668,7 +693,8 @@ public class FirmarPDFHelper {
             }
 	}
         
-        public static void finalizarFirma(String rutaOrigen, String alias, String rutaDestinoDef) throws SignPDFException, IOException {
+        public static String finalizarFirma(String rutaOrigen, String alias, String rutaDestinoDef) throws SignPDFException, IOException {
+            String result = null;
             try {
                 // TODO si tiene password??? -> preguntar pass
                 System.out.println("ruta destino: "+rutaDestinoDef);
@@ -718,10 +744,10 @@ public class FirmarPDFHelper {
                         sap.setImage(sello);
                     }
                     
-                    Float xAux = new Float(Integer.parseInt(imageStatic.getPosX())*RELACION);
-                    Float yAux = new Float(Integer.parseInt(imageStatic.getPosY())*RELACION);
-                    Float widthAux = new Float(Integer.parseInt(imageStatic.getWidth())*RELACION);
-                    Float heightAux = new Float(Integer.parseInt(imageStatic.getHeight())*RELACION);
+                    Float xAux = Integer.parseInt(imageStatic.getPosX())*RELACION;
+                    Float yAux = Integer.parseInt(imageStatic.getPosY())*RELACION;
+                    Float widthAux = Integer.parseInt(imageStatic.getWidth())*RELACION;
+                    Float heightAux = Integer.parseInt(imageStatic.getHeight())*RELACION;
 
                     int width = widthAux.intValue();
                     int height = heightAux.intValue();
@@ -798,6 +824,8 @@ public class FirmarPDFHelper {
                     PdfDictionary dic2 = new PdfDictionary();
                     dic2.put(PdfName.CONTENTS, new PdfString(paddedSig).setHexWriting(true));
                     sap.close(dic2);
+                    
+                    result = sap.getSignDate().toString();
                 }
                 
                 if(sobreescribir) {
@@ -816,17 +844,15 @@ public class FirmarPDFHelper {
                     Display.getDefault().syncExec(new ProgressWriter(ProgressWriter.ERROR, m));
                     throw new SignPDFException(m, e);
                     
-            } catch (IOException e) {
+            } catch (IOException | SignPDFException e) {
                 throw e;
                 
-            } catch (SignPDFException e) {
-                throw e;
-                
-            } catch (Exception e) {
+            } catch (KeyStoreException | UnrecoverableKeyException | NumberFormatException | InvalidKeyException | NoSuchProviderException | CertificateParsingException | SignatureException e) {
                 logger.log(Level.SEVERE, "" , e);
                 throw new SignPDFException("", e);
             }
             System.gc();
+            return result;
         }
         
         //Operaciones post-Firma ***********************************************

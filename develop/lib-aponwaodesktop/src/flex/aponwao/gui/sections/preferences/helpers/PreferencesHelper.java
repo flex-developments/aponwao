@@ -105,7 +105,9 @@ public class PreferencesHelper {
         public static final String APPEARANCE_CODBARRA_WIDTH = "appearance.codbarra.width";
 	public static final String APPEARANCE_CODBARRA_HEIGHT = "appearance.codbarra.height";
         public static final String APPEARANCE_CODBARRA_ENABLE = "appearance.codbarra.enable";
+        public static final String APPEARANCE_CODBARRA_PAGE = "appearance.codbarra.page=1";
         public static final String APPEARANCE_CODBARRA_PATH = "appearance.codbarra.path";
+        public static final String DUPLICADO_CSV_ENABLE = "duplicado.csv.enable";
         public static final String APPEARANCE_CORRELATIVO_ENABLE = "appearance.correlativo.enable";
         public static final String APPEARANCE_CORRELATIVO_PAGE = "appearance.correlativo.page";
         public static final String APPEARANCE_CORRELATIVO_FONT_SIZE = "appearance.correlativo.font.size";
