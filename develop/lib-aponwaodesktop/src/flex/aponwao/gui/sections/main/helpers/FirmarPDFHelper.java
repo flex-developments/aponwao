@@ -658,7 +658,7 @@ public class FirmarPDFHelper {
                     if (PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.APPEARANCE_CODBARRA_ENABLE))
                         rutaOrigen = addSerialEnBarras(rutaOrigen, seriales.get(cont), PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CODBARRA_PAGE));
 
-                    Date sigDate = finalizarFirma(rutaOrigen, alias, rutasDestino.get(cont));
+                    Date signDate = finalizarFirma(rutaOrigen, alias, rutasDestino.get(cont));
                     
                     //Escribir linea en el csv
                     if (writer!=null) {
@@ -666,7 +666,7 @@ public class FirmarPDFHelper {
                             writer.append(
                                 correlativo + ";" +
                                 CertificateHelper.getCN((X509Certificate) ks.getCertificateChain(alias)[0]) + ";" +
-                                "en fecha " + DateFormat.getDateInstance().format(sigDate) + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(sigDate)
+                                "en fecha " + DateFormat.getDateInstance().format(signDate) + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(signDate)
                             );
                         } catch (KeyStoreException ex) {
                             throw new IOException(ex);
