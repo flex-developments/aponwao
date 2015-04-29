@@ -109,6 +109,10 @@ public class PreferencesHelper {
         public static final String APPEARANCE_CORRELATIVO_ENABLE = "appearance.correlativo.enable";
         public static final String APPEARANCE_CORRELATIVO_PAGE = "appearance.correlativo.page";
         public static final String APPEARANCE_CORRELATIVO_FONT_SIZE = "appearance.correlativo.font.size";
+        public static final String APPEARANCE_CORRELATIVO_FONT_BOLD = "appearance.correlativo.font.bold";
+        public static final String APPEARANCE_CORRELATIVO_FONT_ITALICS = "appearance.correlativo.font.italics";
+        public static final String APPEARANCE_CORRELATIVO_POS_X = "appearance.correlativo.posX";
+        public static final String APPEARANCE_CORRELATIVO_POS_Y = "appearance.correlativo.posY";
         public static final String APPEARANCE_COLETILLA_FACTURA = "appearance.coletilla.factura";
         public static final String APPEARANCE_COLETILLA_FACTURA_X = "appearance.coletilla.factura.x";
         public static final String APPEARANCE_COLETILLA_FACTURA_SUFIX_FILE = PREFERENCES_PATH + File.separatorChar + "coletilla.conf";

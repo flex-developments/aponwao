@@ -257,11 +257,27 @@ public class FirmarPDFHelper {
         }
         
         //Core para modificacion del documento********************************************
-        private static void agregarTexto(PdfStamper stamper, String texto, int pagina, int posX, int posY, int rotacion, int tamanoLetra) throws DocumentException, IOException {
+        private static void agregarTexto(
+            PdfStamper stamper, 
+            String texto, 
+            int pagina, 
+            int posX, 
+            int posY, 
+            int rotacion, 
+            int tamanoLetra,
+            boolean negrita,
+            boolean cursiva
+        ) throws DocumentException, IOException {
             PdfContentByte cb = stamper.getOverContent(pagina);
             cb.beginText();
             BaseFont bf = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
             cb.setFontAndSize(bf, tamanoLetra);
+            if(negrita) {
+                cb.setCharacterSpacing(1);
+                cb.setLineWidth(new Float("0.5"));
+                cb.setTextRenderingMode(PdfContentByte.TEXT_RENDER_MODE_FILL_STROKE);
+            }
+            if (cursiva) cb.setTextMatrix(1, 0, 25, 1, 0, 0);
             cb.showTextAligned(PdfContentByte.ALIGN_LEFT, texto, posX, posY, rotacion);
             cb.endText();
         }
@@ -333,18 +349,20 @@ public class FirmarPDFHelper {
                 java.util.Date utilDate = new java.util.Date(); //fecha actual
                 long lnMilisegundos = utilDate.getTime();
                 java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(lnMilisegundos);
-
+                
+                boolean negrita = false;
+                boolean cursiva = false;
                 if(pagina>0) {
-                    agregarTexto(stamper, "Firmado electrónicamente por", pagina, posX, posY-20, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
-                    agregarTexto(stamper, cn, pagina, posX, posY-30, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
-                    agregarTexto(stamper, "en fecha "+sqlTimestamp, pagina, posX, posY-40, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
+                    agregarTexto(stamper, "Firmado electrónicamente por", pagina, posX, posY-20, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
+                    agregarTexto(stamper, cn, pagina, posX, posY-30, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
+                    agregarTexto(stamper, "en fecha "+sqlTimestamp, pagina, posX, posY-40, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
 
                 } else {
                     int total = reader.getNumberOfPages();
                     for(int i=1; i <= total; i++) {
-                        agregarTexto(stamper, "Firmado electrónicamente por", i, posX, posY-20, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
-                        agregarTexto(stamper, cn, i, posX, posY-30, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
-                        agregarTexto(stamper, "en fecha "+sqlTimestamp, i, posX, posY-40, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
+                        agregarTexto(stamper, "Firmado electrónicamente por", i, posX, posY-20, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
+                        agregarTexto(stamper, cn, i, posX, posY-30, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
+                        agregarTexto(stamper, "en fecha "+sqlTimestamp, i, posX, posY-40, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
                     }
                 }
 
@@ -373,17 +391,21 @@ public class FirmarPDFHelper {
                 
                 //Leer coordenadas
                 Rectangle rec = reader.getPageSize(pagina);
-                int posX = 35;
-                int posY = new Float(rec.getHeight() - 50).intValue();
+                int posX = PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CORRELATIVO_POS_X);
+                //int posY = new Float(rec.getHeight() - 50).intValue();
+                int posY = PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CORRELATIVO_POS_Y);
                 
                 //Agregar correlativo ------------------------------------------
+                boolean negrita = PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.APPEARANCE_CORRELATIVO_FONT_BOLD);
+                boolean cursiva = PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.APPEARANCE_CORRELATIVO_FONT_ITALICS);
+                
                 if(pagina>0) {
-                    agregarTexto(stamper, String.valueOf(correlativo), pagina, posX, posY, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CORRELATIVO_FONT_SIZE));
+                    agregarTexto(stamper, String.valueOf(correlativo), pagina, posX, posY, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CORRELATIVO_FONT_SIZE), negrita, cursiva);
 
                 } else {
                     int total = reader.getNumberOfPages();
                     for(pagina=1; pagina <= total; pagina++)
-                        agregarTexto(stamper, String.valueOf(correlativo), pagina, posX, posY, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CORRELATIVO_FONT_SIZE));
+                        agregarTexto(stamper, String.valueOf(correlativo), pagina, posX, posY, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CORRELATIVO_FONT_SIZE), negrita, cursiva);
                 }
                 
                 reader.close();
@@ -426,7 +448,7 @@ public class FirmarPDFHelper {
                 
                 //Agregar imagen -----------------------------------------------
                 agregarImagen(stamper, staticImage, pagina, width, height, posX, posY);
-                agregarTexto(stamper, codigo, pagina, 410, 475, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE));
+                agregarTexto(stamper, codigo, pagina, 410, 475, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), false, false);
 
                 reader.close();
                 stamper.close();
@@ -489,7 +511,7 @@ public class FirmarPDFHelper {
                 if(pagina>0) {
                     int proximaLinea = 0;
                     for (String linea : coletilla) {
-                        agregarTexto(stamper, linea, pagina, posX, posY-proximaLinea, DEFAULT_ROTACION_LETRA, tamanoLetra);
+                        agregarTexto(stamper, linea, pagina, posX, posY-proximaLinea, DEFAULT_ROTACION_LETRA, tamanoLetra, false, false);
                         proximaLinea = proximaLinea + tamanoLetra + 1;
                     }
 
@@ -498,7 +520,7 @@ public class FirmarPDFHelper {
                     for(pagina=1; pagina <= total; pagina++) {
                         int proximaLinea = 0;
                         for (String linea : coletilla) {
-                            agregarTexto(stamper, linea, pagina, posX, posY-proximaLinea, DEFAULT_ROTACION_LETRA, tamanoLetra);
+                            agregarTexto(stamper, linea, pagina, posX, posY-proximaLinea, DEFAULT_ROTACION_LETRA, tamanoLetra, false, false);
                             proximaLinea = proximaLinea + tamanoLetra + 1;
                         }
                     }
