@@ -84,6 +84,7 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
+import java.text.DateFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -94,7 +95,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.IIOException;
 import javax.security.auth.login.LoginException;
 import javax.swing.JOptionPane;
 import org.eclipse.swt.widgets.Display;
@@ -355,22 +355,21 @@ public class FirmarPDFHelper {
                 String cn = CertificateHelper.getCN((X509Certificate) ks.getCertificateChain(alias)[0]);
 
                 java.util.Date utilDate = new java.util.Date(); //fecha actual
-                long lnMilisegundos = utilDate.getTime();
-                java.sql.Timestamp sqlTimestamp = new java.sql.Timestamp(lnMilisegundos);
+                String stringDate = DateFormat.getDateInstance().format(utilDate) + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(utilDate);
                 
                 boolean negrita = false;
                 boolean cursiva = false;
                 if(pagina>0) {
                     agregarTexto(stamper, "Firmado electrónicamente por", pagina, posX, posY-20, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
                     agregarTexto(stamper, cn, pagina, posX, posY-30, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
-                    agregarTexto(stamper, "en fecha "+sqlTimestamp, pagina, posX, posY-40, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
+                    agregarTexto(stamper, "en fecha "+stringDate, pagina, posX, posY-40, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
 
                 } else {
                     int total = reader.getNumberOfPages();
                     for(int i=1; i <= total; i++) {
                         agregarTexto(stamper, "Firmado electrónicamente por", i, posX, posY-20, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
                         agregarTexto(stamper, cn, i, posX, posY-30, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
-                        agregarTexto(stamper, "en fecha "+sqlTimestamp, i, posX, posY-40, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
+                        agregarTexto(stamper, "en fecha "+stringDate, i, posX, posY-40, DEFAULT_ROTACION_LETRA, PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_FONT_SIZE), negrita, cursiva);
                     }
                 }
 
@@ -659,7 +658,7 @@ public class FirmarPDFHelper {
                     if (PreferencesHelper.getPreferences().getBoolean(PreferencesHelper.APPEARANCE_CODBARRA_ENABLE))
                         rutaOrigen = addSerialEnBarras(rutaOrigen, seriales.get(cont), PreferencesHelper.getPreferences().getInt(PreferencesHelper.APPEARANCE_CODBARRA_PAGE));
 
-                    String sigDate = finalizarFirma(rutaOrigen, alias, rutasDestino.get(cont));
+                    Date sigDate = finalizarFirma(rutaOrigen, alias, rutasDestino.get(cont));
                     
                     //Escribir linea en el csv
                     if (writer!=null) {
@@ -667,7 +666,7 @@ public class FirmarPDFHelper {
                             writer.append(
                                 correlativo + ";" +
                                 CertificateHelper.getCN((X509Certificate) ks.getCertificateChain(alias)[0]) + ";" +
-                                "en fecha " + sigDate
+                                "en fecha " + DateFormat.getDateInstance().format(sigDate) + " " + DateFormat.getTimeInstance(DateFormat.SHORT).format(sigDate)
                             );
                         } catch (KeyStoreException ex) {
                             throw new IOException(ex);
@@ -693,8 +692,8 @@ public class FirmarPDFHelper {
             }
 	}
         
-        public static String finalizarFirma(String rutaOrigen, String alias, String rutaDestinoDef) throws SignPDFException, IOException {
-            String result = null;
+        public static Date finalizarFirma(String rutaOrigen, String alias, String rutaDestinoDef) throws SignPDFException, IOException {
+            Date result = null;
             try {
                 // TODO si tiene password??? -> preguntar pass
                 System.out.println("ruta destino: "+rutaDestinoDef);
@@ -826,7 +825,7 @@ public class FirmarPDFHelper {
                     sap.close(dic2);
                 }
                 
-                result = sap.getSignDate().toString();
+                result = sap.getSignDate().getTime();
                 
                 if(sobreescribir) {
                     //ExportHelper.deleteFile(rutaDestinoDef);
