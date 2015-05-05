@@ -277,15 +277,19 @@ public class FirmarPDFHelper {
             boolean cursiva
         ) throws DocumentException, IOException {
             PdfContentByte cb = stamper.getOverContent(pagina);
-            cb.beginText();
+            cb.beginText(); 
+            
             BaseFont bf = BaseFont.createFont(BaseFont.TIMES_ROMAN, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+            if (cursiva) bf = BaseFont.createFont(BaseFont.TIMES_ITALIC, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+            
             cb.setFontAndSize(bf, tamanoLetra);
             if(negrita) {
                 cb.setCharacterSpacing(1);
                 cb.setLineWidth(new Float("0.5"));
                 cb.setTextRenderingMode(PdfContentByte.TEXT_RENDER_MODE_FILL_STROKE);
             }
-            if (cursiva) cb.setTextMatrix(1, 0, 25, 1, 0, 0);
+            //if (cursiva) cb.setTextMatrix(1, 0, 25, 1, 0, 0);
+            
             cb.showTextAligned(PdfContentByte.ALIGN_LEFT, texto, posX, posY, rotacion);
             cb.endText();
         }
