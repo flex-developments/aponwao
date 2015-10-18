@@ -10,6 +10,34 @@
 <project name="aponwao" default="default" basedir=".">
     <description>Builds, tests, and runs the project aponwao.</description>
     <import file="nbproject/build-impl.xml"/>
+    
+    <target name="-post-jar">
+        <echo>Copying resources folder to build cluster directory...</echo>
+        <mkdir dir="${dist.dir}/resources"/>
+        <copy todir="${dist.dir}/resources">
+            <fileset dir="resources" includes="**"/>
+        </copy>
+        
+        <echo>Copying aponwao-user-preferences folder to build cluster directory...</echo>
+        <mkdir dir="${dist.dir}/aponwao-user-preferences"/>
+        <copy todir="${dist.dir}/aponwao-user-preferences">
+            <fileset dir="aponwao-user-preferences" includes="**"/>
+        </copy>
+        
+        <echo>Copying bin folder to build cluster directory...</echo>
+        <mkdir dir="${dist.dir}/bin"/>
+        <copy todir="${dist.dir}/bin">
+            <fileset dir="bin" includes="**"/>
+        </copy>
+        
+        <echo>Copying lib folder to build cluster directory...</echo>
+        <copy todir="${dist.jar.dir}">
+            <fileset dir="${dist.jar.dir}/lib" includes="**"/>
+        </copy>
+        
+        <delete file="${dist.jar.dir}/README.txt"></delete>
+        <delete dir="${dist.jar.dir}/lib"></delete>
+    </target>
     <!--
 
     There exist several targets which are by default empty and which can be 
